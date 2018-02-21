@@ -15,11 +15,15 @@
         {
           "pts": 1,
           "desc": "Extra credit"
+        },
+        {
+          "pts": -100,
+          "desc": "Plagiarism"
         }
       ]
     },
     {
-      "id": "Lab2",
+      "id": "Lab123",
       "totalPts": 100,
       "rules": [
         {
@@ -33,8 +37,97 @@
         {
           "pts": 1,
           "desc": "Extra credit"
+        },
+        {
+          "pts": -100,
+          "desc": "Plagiarism"
         }
       ]
+    }
+  ],
+  "grading": [
+    {
+      "id": "Lab1-1",
+      "assignmentName": "Lab1",
+      "UVID": "1",
+      "totalPts": 100,
+      "actualPts": 101,
+      "selectedRules": [
+        {
+          "pts": 1,
+          "desc": "Extra credit"
+        }
+      ]
+    }
+  ],
+  "students": [
+    {
+      "name": "Joseph Stoops",
+      "UVID": "1"
+    },
+    {
+      "name": "Eric Hutchinson",
+      "UVID": "2"
+    },
+    {
+      "name": "Paul Madsen",
+      "UVID": "3"
+    },
+    {
+      "name": "Jesse Croxford",
+      "UVID": "4"
+    },
+    {
+      "name": "Jeremy Ellsworth",
+      "UVID": "5"
+    },
+    {
+      "name": "Samuel Funston",
+      "UVID": "6"
+    },
+    {
+      "name": "Parker Hill",
+      "UVID": "7"
+    },
+    {
+      "name": "Joel Johnson",
+      "UVID": "8"
+    },
+    {
+      "name": "David Koch",
+      "UVID": "9"
+    },
+    {
+      "name": "Travis Lindsay",
+      "UVID": "10"
+    },
+    {
+      "name": "Tanner McAllister",
+      "UVID": "11"
+    },
+    {
+      "name": "Bob McCann",
+      "UVID": "12"
+    },
+    {
+      "name": "Jeffrey Mortenson",
+      "UVID": "13"
+    },
+    {
+      "name": "Joshua Mortenson",
+      "UVID": "14"
+    },
+    {
+      "name": "Andrew Ripley",
+      "UVID": "15"
+    },
+    {
+      "name": "Harrison Thomas",
+      "UVID": "16"
+    },
+    {
+      "name": "Cameron Thredgold",
+      "UVID": "17"
     }
   ],
   "comments": [
