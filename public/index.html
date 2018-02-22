@@ -141,6 +141,7 @@
                 let found = this.assignments.filter(e => e.id === this.currentAssignment);
                 this.rules = found[0].rules;
                 this.totalPts = found[0].totalPts;
+                this.plusFormActive = false;
             }
         },
         created: function () {
