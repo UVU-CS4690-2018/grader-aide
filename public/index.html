@@ -1,150 +1,190 @@
 <!DOCTYPE html>
-<html>
 
 <head>
-  <meta charset="UTF-8">
-  <title>GraderAide</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  <style>
-     .clickable { /* TODO */
-       cursor: pointer;
-     }
-  </style>
-  
-  <script src="https://cdn.jsdelivr.net/npm/vue"></script><!-- TODO -->
+    <meta charset="UTF-8">
+    <title>GraderAide</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+
+        .removeButton {
+            color: red;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script><!-- TODO -->
+    <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
 </head>
 
 <body>
-  <div class="container" id="app">
+<div class="container" id="app">
     <div class="row">
-      
-      <!-- title row -->
-      <div class="col-xl-6 offset-xl-3">
-        <h1>{{assignmentName}}</h1><!-- TODO -->
-        <h4>{{totalPts}} pts</h4>
 
-        <!-- rules rows -->
-        <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
-          <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-            {{rule.pts | positive}} {{rule.desc}}
-            <span class="clickable float-right" @click="removeRule(i)" v-html="REDX" title="Remove"></span><br>
-          </input>
-        </div>
-        
-        <!-- add row -->
-        <input type="number" class="col-xl-2" v-model.number="addNum" title="pts (positive or negative)">
-        <input type="text"   class="col-xl-5" v-model.trim="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
-        <span class="clickable float-right" @click="addRule()" title="Add">+</span><br>
+        <!-- title row -->
+        <div class="col-xl-6 offset-xl-3">
+            <div class="card" style="margin-top: 4rem">
+                <div class="card-body">
+                    <nav class="navbar navbar-default">
+                        <div class="container-fluid">
+                            <ul class="nav navbar-nav">
+                                <select class="custom-select custom-select-lg mb-3" v-model="currentAssignment"
+                                        @change="getAssignment()">
+                                    <option selected disabled>Select Assignment</option>
+                                    <option v-for="assignment in assignments" v-bind:value="assignment.id">
+                                        {{assignment.id}}
+                                    </option>
+                                </select>
+                            </ul>
+                            <ul class="nav navbar-nav navbar-right">
+                                <p class="navbar-text"><b>Points {{totalPts}}</b></p>
+                            </ul>
+                        </div>
+                    </nav>
+                    <hr/>
+                    <div v-if="!plusFormActive && currentAssignment != 'Select Assignment'"
+                         @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable"
+                                                           title="Open Add Fields"></div>
 
-        <!-- output rows -->
-        <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
-          <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <hr> {{actualPts}}
+
+                    <!-- rules rows -->
+                    <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
+                        <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
+                        {{rule.pts | positive}} {{rule.desc}}
+                        <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')"
+                             title="Edit">
+                        <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)"
+                             title="Remove">
+                        <br>
+                        </input>
+                    </div>
+                    <!-- add row -->
+                    <div v-if="plusFormActive">
+                        <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addRule()"
+                               title="pts (positive or negative)">
+                        <input type="text" class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()"
+                               placeholder="Type your new rule here ...">
+                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
+                    </div>
+
+                    <!-- output rows -->
+                    <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
+                        <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+                        <hr>
+                        {{actualPts}}
+                    </div>
+                    <div v-else class="alert alert-success" role="alert">
+                        <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+                        <b>Good Job</b>
+                        <hr>
+                        {{actualPts}}
+                    </div>
+                </div>
+            </div>
         </div>
-        <div v-else class="alert alert-success" role="alert">
-          <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <b>Good Job</b>
-          <hr> {{actualPts}}
-        </div>
-      </div>
     </div>
-<pre>{{addNum}} {{addDesc}}</pre>    
-  </div>
+    <pre>plusFormActive is {{plusFormActive}}</pre>
+</div>
 
 <script>
-/* global Vue */
-let app = new Vue({
-  el: '#app',
-  data: { //persisted data
-    assignmentName: 'Lab 1',
-    totalPts: 100,
-    rules: [
-      {pts: -1, desc: 'wrong file name'},
-      {pts: -5, desc: 'magic number'},
-      {pts: +1, desc: 'Extra credit'}
-    ],
-    //gui state
-    REDX: '&#10060;',
-    selectedRules: [],
-    addNum: null,
-    addDesc: null
-  },
-  filters: {
-    positive: function(num) { //TODO make all caps
-      if (num > 0) return `+${num}`;
-      return num;
-    }
-  },
-  computed: {
-    actualPts: function() { //add up all selected pts and subtract from totalPts
-      return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+    /* global axios */
+    /* global Vue */
+    let app = new Vue({
+        el: '#app',
+        data: { //persisted data
+            name: null,
+            totalPts: 0,
+            rules: [],
+            assignments: [],
+            comments: [],
+            profile: null,
+            //temporary gui state
+            selectedRules: [],
+            addNum: null,
+            addDesc: null,
+            plusFormActive: false,
+            currentAssignment: "Select Assignment"
+        },
+        filters: {
+            positive: function (num) { //TODO make all caps
+                if (num > 0) return `+${num}`;
+                return num;
+            }
+        },
+        computed: {
+            actualPts: function () { //add up all selected pts and subtract from totalPts
+                return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
 
-      //   let sum = this.totalPts;
-      //   for (rule of this.selectedRules) {
-      //       sum += rule.pts;
-      //   }
-      //   return sum;
-    }
-  },
-  methods: {
-    removeRule: function(i) {
-      this.rules.splice(i,1);
-    },
-    addRule: function() {
-      if (!this.addNum)  return;
-      if (!this.addDesc) return;
-      this.rules.push({ pts: this.addNum, desc: this.addDesc });
-      this.addNum = null;
-      this.addDesc = null;
-    }
-  }
-})
+                //   let sum = this.totalPts;
+                //   for (rule of this.selectedRules) {
+                //       sum += rule.pts;
+                //   }
+                //   return sum;
+            }
+        },
+        methods: {
+            removeRule: function (i) {
+                this.rules.splice(i, 1);
+            },
+            addRule: function () {
+                if (!this.addNum) return;
+                if (!this.addDesc) return;
+                this.rules.push({pts: this.addNum, desc: this.addDesc});
+                this.addNum = null;
+                this.addDesc = null;
+                this.plusFormActive = false;
+            },
+            getAssignment: function () {
+                console.log(this.currentAssignment);
+                console.log(this.assignments.filter(e => e.id === this.currentAssignment));
+                let found = this.assignments.filter(e => e.id === this.currentAssignment);
+                this.rules = found[0].rules;
+                this.totalPts = found[0].totalPts;
+            }
+        },
+        created: function () {
+            let self = this;
+            axios.get('db.json')
+                .then(function (response) {
+                    console.log(response.data);
+                    self.assignments = response.data.assignments;
+                    self.comments = response.data.comments;
+                    self.profile = response.data.profile;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    })
 
-//CLASS MILESTONE
-//TODO lazy modifier
-//TODO load
-//REFACTOR clean up add
-// - pop up the add line
-// - make the text boxes prettier
-// - get a nicer PLUS
-// - make the plus green
-//REFACTOR the two output sections into one
-//FIXME if rule is checked, and then deleted, it's still listed in summary
+    //CLASS MILESTONE
+    //TODO lazy modifier
+    //TODO load
+    //REFACTOR clean up add
+    // - pop up the add line
+    // - make the text boxes prettier
+    // - get a nicer PLUS
+    // - make the plus green
+    //REFACTOR the two output sections into one
+    //FIXME if rule is checked, and then deleted, it's still listed in summary
 
+    //TEAM MILESTONE
+    //TODO save (storing the json) via axios
+    //TODO recover/restore deleted rule in memory stack
+    //TODO edit rule
+    //TODO edit name
+    //TODO edit totalPts
+    //TODO list of comments (no points up or down)
+    //TODO edit list of comments (no points up or down)
+    //TODO delete list of comments/recovering
+    //TODO create a new assignment
 
-//TEAM MILESTONE
-//TODO save (storing the json) via axios
-//TODO recover/restore deleted rule in memory stack
-//TODO edit rule
-//TODO edit name
-//TODO edit totalPts
-//TODO list of comments (no points up or down)
-//TODO edit list of comments (no points up or down)
-//TODO delete list of comments/recovering
-//TODO create a new assignment
-travis, tanner, bob
-joel, jeremy, cameron
-jessie, harry, andrew
-paul, eric, joseph
-josh, jeff, david
-sam, parker
-
-
-
-//FUTURE
-
-
-
-
-
-
-
-
-
-//TODO load (reading the json)
-//TODO partial credit
-//TODO late penalty percentage
-//TODO tie to Canvas API
+    //FUTURE
+    //TODO load (reading the json)
+    //TODO partial credit
+    //TODO late penalty percentage
+    //TODO tie to Canvas API
 
 </script>
 </body>
