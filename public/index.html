@@ -61,9 +61,9 @@
                     </div>
                     <!-- add row -->
                     <div v-if="plusFormActive">
-                        <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addRule()"
+                        <input type="text" class="col-xl-2" v-model.number.lazy="addNum" @keyup.enter="addRule()"
                                title="pts (positive or negative)">
-                        <input type="text" class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()"
+                        <input type="text" class="col-xl-9" v-model.trim.lazy="addDesc" @keyup.enter="addRule()"
                                placeholder="Type your new rule here ...">
                         <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
                     </div>
