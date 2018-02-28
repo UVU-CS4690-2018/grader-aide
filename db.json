@@ -21,28 +21,6 @@
           "desc": "Plagiarism"
         }
       ]
-    },
-    {
-      "id": "Lab123",
-      "totalPts": 100,
-      "rules": [
-        {
-          "pts": -1,
-          "desc": "wrong file name"
-        },
-        {
-          "pts": -5,
-          "desc": "magic number"
-        },
-        {
-          "pts": 1,
-          "desc": "Extra credit"
-        },
-        {
-          "pts": -100,
-          "desc": "Plagiarism"
-        }
-      ]
     }
   ],
   "grading": [
@@ -129,15 +107,5 @@
       "name": "Cameron Thredgold",
       "UVID": "17"
     }
-  ],
-  "comments": [
-    {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
-    }
-  ],
-  "profile": {
-    "name": "typicode"
-  }
+  ]
 }

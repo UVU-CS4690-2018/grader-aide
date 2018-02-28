@@ -22,6 +22,7 @@
         <input v-else type="text" v-model="assignmentName" @keyup.enter="editTitle = false">
         <h4>{{totalPts}} pts</h4>
         <div v-if="!plusFormActive"><img src="img/plusGreen.svg" class="clickable" @click="plusFormActive=true" title="Add Rule"></div>
+        <img src="img/undoBlack.svg" class="clickable" @click="restoreRule()" title="Restore Rule">
 
         <!-- List of all rules -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
@@ -72,6 +73,7 @@
         students: [],
         selectedStudent: null,
         selectedRules: [],
+        deletedRules: [],
         addNum: 0,
         addDesc: null,
         plusFormActive: false,
@@ -90,7 +92,10 @@
       },
       methods: {
         removeRule: function(i) {
-          this.rules.splice(i,1);
+            this.deletedRules.push(this.rules.splice(i,1)[0]);
+        },
+        restoreRule: function() {
+            this.rules.push(this.deletedRules.pop());
         },
         addRule: function(){
           if (this.addNum === 0 || this.addDesc === "") return;
@@ -165,7 +170,7 @@
 
     //TEAM MILESTONE
     //TODO save (storing the json) via axios                -- Joseph Stoops
-    //TODO recover/restore deleted rule in memory stack
+    //TODO recover/restore deleted rule in memory stack     -- Joseph Stoops
     //TODO edit rule
     //TODO edit name                                        -- Joseph Stoops
     //TODO edit totalPts
