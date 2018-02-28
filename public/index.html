@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +24,7 @@
   <!-- custom styles -->
   <link rel="stylesheet" href="assets/styles/styles.css">
 </head>
+
 <body>
   <div id="app">
     <div class="assignment-container main-background">
@@ -33,22 +35,54 @@
               <div class="card-content">
                 <span class="card-title main-card">{{assignmentName}}</span>
                 <div class="divider"></div>
-                
                 <div class="row">
-                    <div class="col s12 m6">
-                      <div class="card blue-grey darken-1">
-                        <div class="card-content white-text">
-                          <span class="card-title">Card Title</span>
-                          <p>I am a very simple card. I am good at containing small bits of information.
-                          I am convenient because I require little markup to use effectively.</p>
-                        </div>
-                        <div class="card-action">
-                          <a href="#">This is a link</a>
-                          <a href="#">This is a link</a>
-                        </div>
+                    <!-- accordian card -->
+                  <div class="col s8">
+                      <ul class="collapsible" data-collapsible="accordion">
+                          <!-- rules -->
+                          <li>
+                            <div class="collapsible-header active">
+                              <i class="material-icons">playlist_add_check</i>Rules</div>
+                            <div class="collapsible-body">
+                              <form>
+                                <p v-for="rule of rules">
+                                  <input type="checkbox" @click="handleRuleStatusChange(rule)" :id="rule.desc" />
+                                  <label :for="rule.desc">{{rule.pts}} {{rule.desc}}</label>
+                                </p>
+                              </form>
+                            </div>
+                          </li>
+                          <!-- comments -->
+                          <li>
+                            <div class="collapsible-header">
+                              <i class="material-icons">comment</i>Comments</div>
+                            <div class="collapsible-body">
+                              <span>Lorem ipsum dolor sit amet.</span>
+                            </div>
+                          </li>
+
+                          <button class="btn waves-effect waves-light z-depth-0 green" type="submit" name="action">Submit
+                            <i class="material-icons right">send</i>
+                          </button>
+                          <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+                            <i class="material-icons right">send</i>
+                          </button>
+                        </ul>
+                        
+                  </div>
+
+                  <!-- summary card -->
+                  <div class="col s4">
+                    <div class="card">
+                      <div class="card-content">
+                        <ul class="collection with-header">
+                          <li class="collection-header"><h4>Rules</h4></li>
+                          <li class="collection-item" v-for="rule of selectedRules">{{rule.pts}} {{rule.desc}}</li>
+                        </ul>
                       </div>
                     </div>
                   </div>
+                </div>
               </div>
               <!-- <div class="card-action">
                 <a href="#">This is a link</a>
@@ -69,14 +103,25 @@
       assignmentName: 'Lab 1',
       totalPts: 100,
       rules: [
-        {pts: -1, desc: 'wrong file name'},
-        {pts: -5, desc: 'magic number'},
-        {pts: 1, desc: 'Extra credit'}
+        { id: 1, pts: -1, desc: 'wrong file name', checked: false },
+        { id: 2, pts: -5, desc: 'magic number', checked: false },
+        { id: 3, pts: 1, desc: 'Extra credit', checked: false }
       ]
+    },
+    methods: {
+      handleRuleStatusChange(rule) {
+        rule.checked = !rule.checked
+      }
+    },
+    computed: {
+      selectedRules() {
+        return this.rules.filter(rule => rule.checked)
+      }
     },
     components: {
       'hello-world': httpVueLoader('./components/HelloWorld.vue')
     }
   })
 </script>
+
 </html>
