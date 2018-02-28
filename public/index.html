@@ -113,11 +113,17 @@
                             @click="saveState()">
                         Save
                     </button>
-                    <div v-if="!plusFormActive && currentAssignment != 'Select Assignment'"
-                         @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable"
-                                                           title="Open Add Fields"></div>
+                    <div class="row">
+                        <div class="col-sm-1" v-if="!plusFormActive && currentAssignment != 'Select Assignment'"
+                             @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable"
+                                                               title="Open Add Fields">
+                        </div>
 
-
+                        <div class="col-sm-1" v-if="removedRulesStack.length > 0 && currentAssignment != 'Select Assignment'"
+                             @click="undoRemove()"><img src="img/undoBlack.svg" class="clickable"
+                                                               title="Undo">
+                        </div>
+                    </div>
                     <!-- rules rows -->
                     <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
                         <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
@@ -287,7 +293,8 @@
                 ordernumber: null
             },
             srtRulesAmount: 0,
-            endRulesAmount: 0
+            endRulesAmount: 0,
+            removedRulesStack: []
         },
         components: {
             ModalComment: ModalComment
@@ -311,6 +318,11 @@
         },
         methods: {
             removeRule: function (i) {
+                let obj =  {
+                    'idx': i,
+                    'val': this.rules[i]
+                };
+                this.removedRulesStack.push(obj);
                 this.rules.splice(i, 1);
                 this.endRulesAmount--;
             },
@@ -326,9 +338,22 @@
                 this.plusFormActive = false;
                 this.endRulesAmount++;
             },
+            undoRemove: function () {
+                let i = this.removedRulesStack.pop();
+                console.log(i.idx, i.val);
+                this.rules.splice(i.idx, 0, i.val);
+            },
             getAssignment: function () {
                 //console.log(this.currentAssignment);
                 //console.log(this.assignments.filter(e => e.id === this.currentAssignment));
+                console.log(this.removedRulesStack);
+                while(this.removedRulesStack.length > 0) {
+                    let i = this.removedRulesStack.pop();
+                    console.log(i.idx, i.val);
+                    this.rules.splice(i.idx, 0, i.val);
+
+                   // this.removedRulesStack = [];
+                }
                 let found = this.assignments.filter(e => e.id === this.currentAssignment);
                 console.log(found[0].rules);
                 this.rules = found[0].rules;
@@ -404,7 +429,7 @@
 
     //TEAM MILESTONE
     //TODO save (storing the json) via axios
-    //TODO recover/restore deleted rule in memory stack
+    //TODO recover/restore deleted rule in memory stack --DONE
     //TODO edit rule
     //TODO edit name
     //TODO edit totalPts
