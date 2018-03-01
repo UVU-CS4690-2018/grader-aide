@@ -63,7 +63,8 @@
 
 <body>
 <div class="container" id="app">
-    <modal-comment :config="modalConfig" :assignment="assignment" @update:assignment="value => pushValue(value)" ></modal-comment>
+    <modal-comment :config="modalConfig" :assignment="assignment" :title="modalTitle"
+                   @update:assignment="value => pushValue(value)"></modal-comment>
 
     <div class="row">
 
@@ -103,7 +104,8 @@
                     <form class="form-inline" v-if="createNew">
                         <div class="form-group ml-4 mb-2">
                             <label for="addAssignment" class="sr-only">Name</label>
-                            <input type="text" class="form-control" id="addAssignment" placeholder="Name" v-model.trim.lazy="addAssignment">
+                            <input type="text" class="form-control" id="addAssignment" placeholder="Name"
+                                   v-model.trim.lazy="addAssignment">
                         </div>
                         <button type="button" class="btn btn-light mb-2" @click="createNewAssignment()">Add</button>
                     </form>
@@ -119,9 +121,10 @@
                                                                title="Open Add Fields">
                         </div>
 
-                        <div class="col-sm-1" v-if="removedRulesStack.length > 0 && currentAssignment != 'Select Assignment'"
+                        <div class="col-sm-1"
+                             v-if="removedRulesStack.length > 0 && currentAssignment != 'Select Assignment'"
                              @click="undoRemove()"><img src="img/undoBlack.svg" class="clickable"
-                                                               title="Undo">
+                                                        title="Undo">
                         </div>
                     </div>
                     <!-- rules rows -->
@@ -160,7 +163,7 @@
             </div>
         </div>
     </div>
-    <pre>plusFormActive is {{addAssignment}}</pre>
+    <pre>assignment is {{assignment}}</pre>
 </div>
 
 <!--template for the basic modal-->
@@ -175,16 +178,18 @@
 <template id="modal-comment">
     <modal :config="config">
         <div class="modal-header">
-            <h5>New Assignment</h5>
+            <h5>{{title}}</h5>
         </div>
         <div class="modal-body">
             <div class="form-group">
                 <label for="assignment">Name</label>
-                <input type="email" class="form-control" id="assignment" placeholder="Name" v-bind:value="assignment.id" v-on:input="updateValue($event.target.value,)" lazy>
+                <input type="email" class="form-control" id="assignment" placeholder="Name" v-bind:value="assignment.id"
+                       v-on:input="updateValue($event.target.value,)" lazy>
             </div>
             <div class="form-group">
                 <label for="points">Points</label>
-                <input type="number" class="form-control" id="points" placeholder="0" v-bind:value="assignment.points" v-on:input="updatePoints($event.target.value)" lazy>
+                <input type="number" class="form-control" id="points" placeholder="0" v-bind:value="assignment.points"
+                       v-on:input="updatePoints($event.target.value)" lazy>
             </div>
         </div>
         <div class="modal-footer">
@@ -201,30 +206,30 @@
     const Modal = Vue.extend({
         props: {
             config: {
-                validator: function(value) {
+                validator: function (value) {
                     return value.hasOwnProperty('show') && typeof value.show === 'boolean'
                 },
             },
         },
-        data: function() {
+        data: function () {
             return {
                 ordernumber: 888
             }
         },
         methods: {
-            close: function() {
+            close: function () {
                 this.config.show = false
             },
         },
-        data: function() {
+        data: function () {
             return {
                 ordernumber: 999
             }
         },
-        ready: function() {
+        ready: function () {
             // Close the modal when the escape key is pressed.
             var self = this
-            document.addEventListener('keydown', function() {
+            document.addEventListener('keydown', function () {
                 if (self.config.show && event.keyCode === 27) {
                     self.close()
                 }
@@ -235,7 +240,7 @@
 
     // Modal Comment Component
     const ModalComment = Vue.extend({
-        props: ['config', 'assignment'],
+        props: ['config', 'assignment', 'title'],
         components: {
             modal: Modal,
         },
@@ -249,16 +254,16 @@
             updatePoints: function (points) {
                 //console.log(points);
                 // this.totalPts = points;
-                this.assignment.totalPts = points;
+                this.assignment.points = points;
 
             },
-            close: function() {
+            close: function () {
                 this.config.show = false;
             },
-            save: function() {
+            save: function () {
                 // TODO: implement the form logic.
                 //console.log('save save', this.assignment);
-                if(this.assignment.id)
+                if (this.assignment.id)
                     this.$emit('update:assignment', this.assignment);
                 this.close();
             },
@@ -285,8 +290,9 @@
             currentAssignment: "Select Assignment",
             createNew: false,
             assignment: {
-                name: null,
-                pts: 0
+                id: null,
+                points: 0,
+                editIdx: -1
             },
             modalConfig: {
                 show: false,
@@ -294,7 +300,8 @@
             },
             srtRulesAmount: 0,
             endRulesAmount: 0,
-            removedRulesStack: []
+            removedRulesStack: [],
+            modalTitle: "New Assignment"
         },
         components: {
             ModalComment: ModalComment
@@ -318,7 +325,7 @@
         },
         methods: {
             removeRule: function (i) {
-                let obj =  {
+                let obj = {
                     'idx': i,
                     'val': this.rules[i]
                 };
@@ -347,12 +354,12 @@
                 //console.log(this.currentAssignment);
                 //console.log(this.assignments.filter(e => e.id === this.currentAssignment));
                 console.log(this.removedRulesStack);
-                while(this.removedRulesStack.length > 0) {
+                while (this.removedRulesStack.length > 0) {
                     let i = this.removedRulesStack.pop();
                     console.log(i.idx, i.val);
                     this.rules.splice(i.idx, 0, i.val);
 
-                   // this.removedRulesStack = [];
+                    // this.removedRulesStack = [];
                 }
                 let found = this.assignments.filter(e => e.id === this.currentAssignment);
                 console.log(found[0].rules);
@@ -365,25 +372,41 @@
                 this.srtRulesAmount = this.rules.length;
                 this.endRulesAmount = this.rules.length;
             },
-            showModal: function() {
+            showModal: function () {
                 // this.modalConfig.ordernumber = id;
-                console.log(this.assignment)
+                console.log(this.assignment);
                 this.modalConfig.show = true;
-                this.assignment.id = null;
-                this.assignment.totalPts = 0;
+                //this.assignment.id = null;
+                //this.assignment.totalPts = 0;
             },
-            pushValue: function(value){
-                let newObj = {};
-                newObj.id = value.id;
-                newObj.totalPts = value.totalPts;
-                newObj.rules = [];
+            pushValue: function (value) {
+                if (value.editIdx >= 0) {
+                    this.assignments[value.editIdx].id = value.id;
+                    this.assignments[value.editIdx].totalPts = value.points;
+                    this.currentAssignment = this.assignments[value.editIdx].id;
+                    this.totalPts = this.assignments[value.editIdx].totalPts;
+                }
+                else {
+
+                    let newObj = {};
+                    newObj.id = value.id;
+                    newObj.totalPts = value.points;
+                    newObj.rules = [];
+                    this.assignments.push(newObj);
+                }
                 //console.log('this is the new obj', newObj);
-                this.assignments.push(newObj);
+
+                this.assignment.id = null;
+                this.assignment.points = 0;
+                this.assignment.editIdx = -1;
+                this.modalTitle = "New Assignment";
                 // console.log(value);
             },
             editAssignment: function () {
-                this.assignment.name = this.currentAssignment;
-                this.assignment.pts = this.totalPts;
+                this.assignment.id = this.currentAssignment;
+                this.assignment.points = this.totalPts;
+                this.assignment.editIdx = this.assignments.findIndex(e => e.id === this.currentAssignment);
+                this.modalTitle = "Edit Assignment";
                 this.showModal();
             },
             saveState: function () {
@@ -394,7 +417,7 @@
                     'profile': this.profile
 
                 };
-                axios.patch('db.json', obj).then(function (response){
+                axios.patch('db.json', obj).then(function (response) {
                     console.log(response);
                 }).catch(function (error) {
                     console.log(error);
@@ -429,14 +452,14 @@
 
     //TEAM MILESTONE
     //TODO save (storing the json) via axios
-    //TODO recover/restore deleted rule in memory stack --DONE
+    //TODO recover/restore deleted rule in memory stack --DONE NT
     //TODO edit rule
-    //TODO edit name
-    //TODO edit totalPts
+    //TODO edit name --DONE NT
+    //TODO edit totalPts --DONE NT
     //TODO list of comments (no points up or down)
     //TODO edit list of comments (no points up or down)
     //TODO delete list of comments/recovering
-    //TODO create a new assignment --DONE
+    //TODO create a new assignment --DONE NT
 
     //FUTURE
     //TODO load (reading the json)
