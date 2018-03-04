@@ -11,6 +11,14 @@
 			"desc": "magic number"
 		},
 		{
+			"pts": -2,
+			"desc": "blatant ignorance"
+		},
+		{
+			"pts": -8,
+			"desc": "inline styling"
+		},
+		{
 			"pts": 1,
 			"desc": "Extra credit"
 		}
