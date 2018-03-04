@@ -13,6 +13,22 @@
         .removeButton {
             color: red;
         }
+    .editName {
+      font-size: 2.5rem;
+      margin-bottom: .5rem;
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.2;
+      color: inherit;
+    }
+    .editTotalPts {
+      font-size: 1.5rem;
+      margin-bottom: .5rem;
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.2;
+      color: inherit;
+    }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
@@ -26,23 +42,36 @@
 
             <!-- title row -->
             <div class="col-xl-6 offset-xl-3">
-                <h1>{{name}} <img src="img/pencilBlack.svg" class="clickable" @click="alert('edit stub')" title="Edit"></h4>
-                </h1>
-                <!-- TODO -->
+        <div class="container">
+          <div class="row">
+            <h1 v-if="!editName" @click="editName = !editName;">{{name}}</h1>
+            <input style="width: 50%" v-else class="editName" type="text" v-model="name">
+            <span v-if="editName" style="padding: 15px;" class="clickable" @click="editName = !editName;">💾</span>
+            <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editName = !editName;" class="clickable">
+          </div>
+        </div>
 
-                <h4>{{totalPts}} pts <img src="img/pencilBlack.svg" class="clickable" @click="alert('edit stub')" title="Edit"></h4>
+        <div class="container">
+          <div class="row">
+            <h4 v-if="!editTotalPts" @click="editTotalPts = !editTotalPts;">{{totalPts}} pts</h4>
+            <input v-else style="width: 20%" class="editTotalPts" type="number" v-model.number="totalPts">
+            <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts;">💾</span>
+            <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editTotalPts = !editTotalPts;" class="clickable">
+          </div>
+        </div>
 
                 <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
 
 
                 <!-- rules rows -->
-                <div v-for="(rule, i) of rules" :key="rule.desc">
-                    <!-- TODO -->
-                    <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules"> {{rule.pts | positive}} {{rule.desc}}
+        <div v-for="(rule, i) of rules" :key="rule.desc">
+            <rule v-model="selectedRules" v-bind:rule="rule" v-bind:index="i" v-on:rulechecked="checkrule" v-on:ruleunchecked="uncheckrule" v-on:deleterule="deleteRule" v-on:rulechanged="ruleChanged"></rule>
+ <!--         <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
+            {{rule.pts | positive}}
                     <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
                     <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
                     <br>
-                    </input>
+          </input>-->
                 </div>
 
                 <!-- add row -->
@@ -64,12 +93,70 @@
                 </div>
             </div>
         </div>
-        <pre>plusFormActive is {{plusFormActive}}</pre>
     </div>
 
     <script>
-        /* global axios */
-        /* global Vue */
+Vue.component('rule', {
+
+    props: ['rule', 'index'],
+    template: `
+                <div>
+                    <input class="rulecheck" @change="check" type="checkbox" name="rubric" :value="rule">
+                    <span v-if="!edit" @click="edit = !edit;">{{rule.pts | positive}} {{rule.desc}}</span>
+                    <span v-else><input style="width: 50px" type="number" v-model="locPts"><input style="width: 75%" type="text" v-model="locDesc"></span>
+                    <img src="img/xRed.svg" class="clickable float-right removeButton" @click="remove" title="Remove">
+                    <img v-if="!edit" src="img/pencilBlack.svg" class="clickable float-right" @click="editvalues" title="Edit">
+                    <span v-else class="clickable float-right" @click="savevalues">💾</span>
+                    </input>
+                </div>
+`,
+    data: function () {
+        return {
+            id: this._uid,
+            edit: false,
+            locDesc: this.rule.desc,
+            locPts: this.rule.pts,
+            checked: false
+        }
+    },
+    filters: {
+        positive: function(num) {
+            if (num > 0) return `+${num}`;
+            return num;
+        }
+    },
+    methods: {
+        remove: function () {
+            this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
+            this.$emit('deleterule', {index: this.index});
+        },
+        editvalues: function () {
+            this.edit = !this.edit;
+        },
+        savevalues: function (event) {
+            this.edit = !this.edit;
+            let oldDesc = this.rule.desc;
+            this.$emit('rulechanged', {desc: this.locDesc, pts: this.locPts, index: this.index});
+            if(oldDesc != this.rule.desc) {
+                this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
+            }
+            if (this.checked && oldDesc == this.rule.desc) {
+                this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
+                this.$emit('rulechecked', { rule: this.rule, id: this.id });
+            }
+        },
+        check: function (event) {
+            if(event.target.checked) {
+                this.$emit('rulechecked', { rule: this.rule, id: this.id });
+                this.checked = true;
+            } else {
+                this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
+                this.checked = false;
+            }
+        }
+    }
+})
+
         let app = new Vue({
             el: '#app',
             data: { //persisted data
@@ -80,10 +167,12 @@
                 selectedRules: [],
                 addNum: null,
                 addDesc: null,
-                plusFormActive: false
+    plusFormActive: false,
+      editName: false,
+      editTotalPts: false
             },
             filters: {
-                positive: function(num) { //TODO make all caps
+    positive: function(num) {
                     if (num > 0) return `+${num}`;
                     return num;
                 }
@@ -91,17 +180,12 @@
             computed: {
                 actualPts: function() { //add up all selected pts and subtract from totalPts
                     return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
-
-                    //   let sum = this.totalPts;
-                    //   for (rule of this.selectedRules) {
-                    //       sum += rule.pts;
-                    //   }
-                    //   return sum;
                 }
             },
             methods: {
-                removeRule: function(i) {
-                    this.rules.splice(i, 1);
+    deleteRule: function(payload) {
+      this.rules.splice(payload.index,1);
+      // TODO, add rule to memory stack of deleted rules...
                 },
                 addRule: function() {
                     if (!this.addNum) return;
@@ -113,7 +197,20 @@
                     this.addNum = null;
                     this.addDesc = null;
                     this.plusFormActive = false;
-                }
+    },
+      checkrule: function (payload) {
+          this.selectedRules.push({id: payload.id, pts: payload.rule.pts, desc: payload.rule.desc});
+      },
+      uncheckrule: function (payload) {
+          this.selectedRules = this.selectedRules.filter(function( obj ) {
+              return obj.id !== payload.id;
+          });
+      },
+      ruleChanged: function (payload) {
+          let rule = this.rules[payload.index];
+          rule.desc = payload.desc;
+          rule.pts = parseInt(payload.pts);
+      }
             },
             created: function() {
                 let self = this;
