@@ -159,11 +159,44 @@
                         <hr>
                         {{actualPts}}
                     </div>
+
+                    <div class="row">
+                        <div class="col-sm-1" v-if="!addCommentActive"
+                             @click="addCommentActive=true"><img src="img/plusGreen.svg" class="clickable"
+                                                               title="Open Add Fields">
+                        </div>
+
+                        <!--<div class="col-sm-1"-->
+                             <!--v-if="removedRulesStack.length > 0 && currentAssignment != 'Select Assignment'"-->
+                             <!--@click="undoRemove()"><img src="img/undoBlack.svg" class="clickable"-->
+                                                        <!--title="Undo">-->
+                        <!--</div>-->
+                    </div>
+
+                    <!-- comment rows -->
+                    <div v-for="(comment, i) of comments" :key="comment.id"><!-- TODO -->
+                        <input type="checkbox" name="rubric" :value="comment.body" v-model="selectedComments">
+                        {{comment.body}}
+                        <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')"
+                             title="Edit">
+                        <img src="img/xRed.svg" class="clickable float-right removeButton" @click="alert(i)"
+                             title="Remove">
+                        <br>
+                        </input>
+
+
+                    </div>
+                    <!-- add comment -->
+                    <div v-if="addCommentActive">
+                        <input type="text" class="col-xl-9" v-model.trim.lazy="addCommentBody" @keyup.enter="addComment()"
+                               placeholder="Type your new comment here ...">
+                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addComment()" title="Add"><br>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <pre>assignment is {{assignment}}</pre>
+    <pre>selectedComments is {{selectedComments}}</pre>
 </div>
 
 <!--template for the basic modal-->
@@ -283,10 +316,13 @@
             profile: null,
             //temporary gui state
             selectedRules: [],
+            selectedComments: [],
             addNum: null,
             addDesc: null,
+            addCommentBody: null,
             addAssignment: null,
             plusFormActive: false,
+            addCommentActive: false,
             currentAssignment: "Select Assignment",
             createNew: false,
             assignment: {
@@ -422,6 +458,15 @@
                 }).catch(function (error) {
                     console.log(error);
                 });
+            },
+            addComment: function () {
+                if (!this.addCommentBody) return;
+                const nextId = this.comments[this.comments.length-1].id++;
+                //add comment to array with id
+                this.comments.push({'id': nextId, 'body': this.addCommentBody, 'postId': nextId});
+                this.addCommentBody = null;
+                this.addCommentActive = false;
+                // console.log(this.addCommentBody);
             }
         },
         created: function () {
@@ -456,10 +501,11 @@
     //TODO edit rule
     //TODO edit name --DONE NT
     //TODO edit totalPts --DONE NT
-    //TODO list of comments (no points up or down)
+    //TODO list of comments (no points up or down) DONE
     //TODO edit list of comments (no points up or down)
     //TODO delete list of comments/recovering
     //TODO create a new assignment --DONE NT
+    //TODO create newAssignement function same as edit.
 
     //FUTURE
     //TODO load (reading the json)
