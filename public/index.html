@@ -20,14 +20,14 @@
       <div class="col-xl-6 offset-xl-3">
         <h1 v-if="!editTitle" @dblclick="editTitle = true">{{ assignmentName }}</h1>
         <input v-else type="text" v-model="assignmentName" @keyup.enter="editTitle = false">
-        <h4>{{totalPts}} pts</h4>
+        <h4>{{totalPts}} pts dog</h4>
         <div v-if="!plusFormActive"><img src="img/plusGreen.svg" class="clickable" @click="plusFormActive=true" title="Add Rule"></div>
         <img src="img/undoBlack.svg" class="clickable" @click="restoreRule()" title="Restore Rule">
 
         <!-- List of all rules -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
           <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-              {{rule.pts | positive}} {{rule.desc}}
+              {{rule.pts | positive}} - {{rule.desc}}
               <span class="clickable float-right">
                 <img src="img/pencilBlack.svg" @click="editRule(i)" title="Edit Rule">
                 <img src="img/xRed.svg" @click="removeRule(i)" title="Remove Rule">
