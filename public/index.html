@@ -50,7 +50,7 @@
         <!-- List of all rules -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
           <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-              {{rule.pts | positive}} {{rule.desc}}
+              {{rule.pts | positive}} - {{rule.desc}}
               <span class="clickable float-right">
                 <img src="img/pencilBlack.svg" @click="editRule(i)" title="Edit Rule">
                 <img src="img/xRed.svg" @click="removeRule(i)" title="Remove Rule">
