@@ -8,21 +8,44 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.min.js"></script>
   <style>
+      body {
+          /* Same as UVU.edu */
+          font-family: "stratum-1-web", Arial, "Lucida Grande", sans-serif;
+      }
      .clickable {
        cursor: pointer;
      }
+     .uvu-borders {
+         border: 1px solid #275d39;
+         border-radius: 5px;
+     }
+     .uvu-button {
+         background-color: #275d39;
+         color: white;
+         font-weight: bold;
+         border: 1px solid #275d39;
+         border-radius: 5px;
+         padding: 5px 20px 5px 20px;
+     }
+      /* UVU Green: #275d39 */
   </style>
 </head>
 
 <body>
   <div class="container" id="app">
     <div class="row">
-      <div class="col-xl-6 offset-xl-3">
+      <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
         <h1 v-if="!editTitle" @dblclick="editTitle = true">{{ assignmentName }}</h1>
         <input v-else type="text" v-model="assignmentName" @keyup.enter="editTitle = false">
-        <h4>{{totalPts}} pts</h4>
-        <div v-if="!plusFormActive"><img src="img/plusGreen.svg" class="clickable" @click="plusFormActive=true" title="Add Rule"></div>
-        <img src="img/undoBlack.svg" class="clickable" @click="restoreRule()" title="Restore Rule">
+
+        <!-- Amount of points title and the add and edit buttons -->
+        <div class="row">
+          <h4 class="col-3">{{totalPts}} pts</h4>
+          <span class="col-2 offset-7 float-right">
+            <img src="img/undoBlack.svg" class="clickable float-right" @click="restoreRule()" title="Restore Rule">
+            <img src="img/plusGreen.svg" v-show="!plusFormActive" class="clickable float-right" @click="plusFormActive=true" title="Add Rule">
+          </span>
+        </div>
 
         <!-- List of all rules -->
         <div v-for="(rule, i) of rules" :key="rule.desc">
@@ -35,25 +58,25 @@
           </input>
         </div>
 
-        <!-- Add new rule button -->
+        <!-- Add new rule form -->
         <div v-if="plusFormActive">
           <input type="text" class="col-xl-2" v-model.number="addNum" @keyup.enter.lazy="addRule()" placeholder="Rule Points" title="Rule Points">
           <input type="text" class="col-xl-9" v-model.trim="addDesc" @keyup.enter.lazy="addRule()" placeholder="Rule Description" title="Rule description" autofocus>
           <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Open add fields">
         </div>
 
-        <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
+        <!-- Results area -->
+        <hr>
+        <div class="alert" :class="{'alert-success': pointsSuccess, 'alert-warning': !pointsSuccess}" role="alert">
           <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+          <b v-if="pointsSuccess">Good Job</b>
           <hr> {{actualPts}}
         </div>
-        <div v-else class="alert alert-success" role="alert">
-          <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <b>Good Job</b>
-          <hr> {{actualPts}}
-        </div>
-        <button @click="saveLab()">save lab</button><br>
-        <button @click="saveGrading()">save grading</button>
-        <select v-model="selectedStudent">
+
+        <!-- submit buttons -->
+        <button class="uvu-button" @click="saveLab()">save lab</button>
+        <button class="uvu-button" @click="saveGrading()">save grading</button>
+        <select class="uvu-borders" style="padding: 5px 0 6px 0;" v-model="selectedStudent">
             <option v-for="student in students" :value="student.UVID">{{ student.name }}</option>
         </select>
       </div>
@@ -88,6 +111,9 @@
       computed: {
         actualPts: function() { //add up all selected pts and subtract from totalPts
           return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+        },
+        pointsSuccess: function(){
+            return this.actualPts >= this.totalPts;
         }
       },
       methods: {
@@ -95,7 +121,7 @@
             this.deletedRules.push(this.rules.splice(i,1)[0]);
         },
         restoreRule: function() {
-            this.rules.push(this.deletedRules.pop());
+            if (this.deletedRules.length > 0) this.rules.push(this.deletedRules.pop());
         },
         addRule: function(){
           if (this.addNum === 0 || this.addDesc === "") return;
@@ -162,12 +188,6 @@
       }
     });
 
-    //CLASS MILESTONE
-    //REFACTOR clean up add
-    //REFACTOR the two output sections into one
-    //FIXME if rule is checked, and then deleted, it's still listed in summary
-
-
     //TEAM MILESTONE
     //TODO save (storing the json) via axios                -- Joseph Stoops
     //TODO recover/restore deleted rule in memory stack     -- Joseph Stoops
@@ -180,11 +200,9 @@
     //TODO create a new assignment                          -- Joseph Stoops
 
 
-    //FUTURE
-    //TODO partial credit
-    //TODO late penalty percentage
-    //TODO tie to Canvas API
-
+    //ITEMS TO TACKLE IN THE FUTURE
+    //TODO add a error message that fades away. (save grading with no student selected, restore rule from empty array, etc.)
+    //TODO
   </script>
 </body>
 

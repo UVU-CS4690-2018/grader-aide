@@ -36,6 +36,14 @@
           "desc": "Extra credit"
         }
       ]
+    },
+    {
+      "id": "Lab1-2",
+      "assignmentName": "Lab1",
+      "UVID": "2",
+      "totalPts": 100,
+      "actualPts": 100,
+      "selectedRules": []
     }
   ],
   "students": [
