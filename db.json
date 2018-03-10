@@ -21,94 +21,6 @@
           "desc": "Plagiarism"
         }
       ]
-    },
-    {
-      "id": "Lab123",
-      "totalPts": 100,
-      "rules": [
-        {
-          "pts": -1,
-          "desc": "wrong file name"
-        },
-        {
-          "pts": -5,
-          "desc": "magic number"
-        },
-        {
-          "pts": 1,
-          "desc": "Extra credit"
-        },
-        {
-          "pts": -100,
-          "desc": "Plagiarism"
-        }
-      ]
-    },
-    {
-      "id": "Lab42",
-      "totalPts": 100,
-      "rules": [
-        {
-          "pts": -1,
-          "desc": "wrong file name"
-        },
-        {
-          "pts": -5,
-          "desc": "magic number"
-        },
-        {
-          "pts": 1,
-          "desc": "Extra credit"
-        },
-        {
-          "pts": -100,
-          "desc": "Plagiarism"
-        }
-      ]
-    },
-    {
-      "id": "Lab42hdyt",
-      "totalPts": 100,
-      "rules": [
-        {
-          "pts": -1,
-          "desc": "wrong file name"
-        },
-        {
-          "pts": -5,
-          "desc": "magic number"
-        },
-        {
-          "pts": 1,
-          "desc": "Extra credit"
-        },
-        {
-          "pts": -100,
-          "desc": "Plagiarism"
-        }
-      ]
-    },
-    {
-      "id": "Lab142",
-      "totalPts": 100,
-      "rules": [
-        {
-          "pts": -1,
-          "desc": "wrong file name"
-        },
-        {
-          "pts": -5,
-          "desc": "magic number"
-        },
-        {
-          "pts": 1,
-          "desc": "Extra credit"
-        },
-        {
-          "pts": -100,
-          "desc": "Plagiarism"
-        }
-      ]
     }
   ],
   "grading": [
@@ -124,6 +36,14 @@
           "desc": "Extra credit"
         }
       ]
+    },
+    {
+      "id": "Lab1-2",
+      "assignmentName": "Lab1",
+      "UVID": "2",
+      "totalPts": 100,
+      "actualPts": 100,
+      "selectedRules": []
     }
   ],
   "students": [
@@ -195,15 +115,5 @@
       "name": "Cameron Thredgold",
       "UVID": "17"
     }
-  ],
-  "comments": [
-    {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
-    }
-  ],
-  "profile": {
-    "name": "typicode"
-  }
+  ]
 }
