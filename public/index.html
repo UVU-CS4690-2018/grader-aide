@@ -130,7 +130,11 @@
         },
         deletedComments: [],//don't save/load me. I'm ephemeral
         activeCommentEdit: null,
-        activeCommentEditText: null
+        activeCommentEditText: null,
+        ruleSpans: [],
+        deletedRuleSpans: [],
+        ruleDivCount: 0,
+        ruleEdit: false
       },
       filters: {
         positive: function(num) {
@@ -159,6 +163,32 @@
           this.addNum = null;
           this.addDesc = null;
           this.plusFormActive = false;
+          let currentRuleSpan = document.getElementById('lastRuleSpan');
+            if(currentRuleSpan != null){
+                currentRuleSpan.id = `ruleSpan${this.ruleDivCount}`;
+                //this.ruleSpans.unshift({spanId: currentRuleSpan.id});
+                console.log(`just created span with id: ${currentRuleSpan.id}`);
+                this.ruleDivCount++;
+
+            }
+            else{
+                // currentRuleSpan.id = `ruleSpan${this.ruleDivCount}`;
+            currentRuleSpan.id = `lastRuleSpan`;
+            console.log(`just created div with id: ${lastRuleSpan}`);
+            }
+        },
+          editRule: function(i) {
+            let rulesSize = this.rules.length-1;
+            // console.log(`rulesSize i = ${rulesSize}`);
+            let spanToEdit = document.getElementById("lastRuleSpan");
+            if(i !== rulesSize){
+                spanToEdit = document.getElementById(`ruleSpan${i}`);
+            }
+             console.log(`spanToEdit = ${spanToEdit.id}`);
+            console.log(`editRule i = ${i}`);
+             //
+             spanToEdit.innerHTML = `<input id="inputNum" type="text" class="col-xl-2" v-model.number="addNum" placeholder="Rule Points" title="Rule Points">
+            <input type="text" id="inputDesc" class="col-xl-9" v-model.trim="addDesc"  placeholder="Rule Description" title="Rule description" autofocus>`;
         },
         saveLab: function(){
             axios.post('http://localhost:3000/assignments', {//TODO json-server won't upsert information with PUT, it only inserts.
