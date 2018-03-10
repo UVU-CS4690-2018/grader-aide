@@ -43,6 +43,72 @@
           "desc": "Plagiarism"
         }
       ]
+    },
+    {
+      "id": "Lab42",
+      "totalPts": 100,
+      "rules": [
+        {
+          "pts": -1,
+          "desc": "wrong file name"
+        },
+        {
+          "pts": -5,
+          "desc": "magic number"
+        },
+        {
+          "pts": 1,
+          "desc": "Extra credit"
+        },
+        {
+          "pts": -100,
+          "desc": "Plagiarism"
+        }
+      ]
+    },
+    {
+      "id": "Lab42hdyt",
+      "totalPts": 100,
+      "rules": [
+        {
+          "pts": -1,
+          "desc": "wrong file name"
+        },
+        {
+          "pts": -5,
+          "desc": "magic number"
+        },
+        {
+          "pts": 1,
+          "desc": "Extra credit"
+        },
+        {
+          "pts": -100,
+          "desc": "Plagiarism"
+        }
+      ]
+    },
+    {
+      "id": "Lab142",
+      "totalPts": 100,
+      "rules": [
+        {
+          "pts": -1,
+          "desc": "wrong file name"
+        },
+        {
+          "pts": -5,
+          "desc": "magic number"
+        },
+        {
+          "pts": 1,
+          "desc": "Extra credit"
+        },
+        {
+          "pts": -100,
+          "desc": "Plagiarism"
+        }
+      ]
     }
   ],
   "grading": [
