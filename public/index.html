@@ -1,209 +1,97 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="UTF-8">
-  <title>GraderAide</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.min.js"></script>
-  <style>
-      body {
-          /* Same as UVU.edu */
-          font-family: "stratum-1-web", Arial, "Lucida Grande", sans-serif;
-      }
-     .clickable {
-       cursor: pointer;
-     }
-     .uvu-borders {
-         border: 1px solid #275d39;
-         border-radius: 5px;
-     }
-     .uvu-button {
-         background-color: #275d39;
-         color: white;
-         font-weight: bold;
-         border: 1px solid #275d39;
-         border-radius: 5px;
-         padding: 5px 20px 5px 20px;
-     }
-      /* UVU Green: #275d39 */
-  </style>
+    <title>GraderAide</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 </head>
 
 <body>
-  <div class="container" id="app">
+<div class="container" id="app">
     <div class="row">
-      <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
-        <h1 v-if="!editTitle" @dblclick="editTitle = true">{{ assignmentName }}</h1>
-        <input v-else type="text" v-model="assignmentName" @keyup.enter="editTitle = false">
+        <div class="col-lg-6 col-lg-offset-3">
+            <h1>{{assignmentName}}</h1>
+            <h4>{{totalPts}} pts</h4>
 
-        <!-- Amount of points title and the add and edit buttons -->
-        <div class="row">
-          <h4 class="col-3">{{totalPts}} pts</h4>
-          <span class="col-2 offset-7 float-right">
-            <img src="img/undoBlack.svg" class="clickable float-right" @click="restoreRule()" title="Restore Rule">
-            <img src="img/plusGreen.svg" v-show="!plusFormActive" class="clickable float-right" @click="plusFormActive=true" title="Add Rule">
-          </span>
+            <div v-for="req in reqs">
+                <input type="checkbox" name="rubric" v-bind:value="req" v-model="selectedReqs"> {{req.pts | positive}} {{req.desc}}<br>
+            </div>
+
+            <div class="alert alert-danger" role="alert">
+                <span v-for="selectedReq in selectedReqs">{{selectedReq.pts | positive}} {{selectedReq.desc}}<br/></span>
+                <hr>
+                {{actualPts}}
+            </div>
         </div>
-
-        <!-- List of all rules -->
-        <div v-for="(rule, i) of rules" :key="rule.desc">
-          <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-              {{rule.pts | positive}} - {{rule.desc}}
-              <span class="clickable float-right">
-                <img src="img/pencilBlack.svg" @click="editRule(i)" title="Edit Rule">
-                <img src="img/xRed.svg" @click="removeRule(i)" title="Remove Rule">
-              </span><br>
-          </input>
-        </div>
-
-        <!-- Add new rule form -->
-        <div v-if="plusFormActive">
-          <input type="text" class="col-xl-2" v-model.number="addNum" @keyup.enter.lazy="addRule()" placeholder="Rule Points" title="Rule Points">
-          <input type="text" class="col-xl-9" v-model.trim="addDesc" @keyup.enter.lazy="addRule()" placeholder="Rule Description" title="Rule description" autofocus>
-          <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Open add fields">
-        </div>
-
-        <!-- Results area -->
-        <hr>
-        <div class="alert" :class="{'alert-success': pointsSuccess, 'alert-warning': !pointsSuccess}" role="alert">
-          <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <b v-if="pointsSuccess">Good Job</b>
-          <hr> {{actualPts}}
-        </div>
-
-        <!-- submit buttons -->
-        <button class="uvu-button" @click="saveLab()">save lab</button>
-        <button class="uvu-button" @click="saveGrading()">save grading</button>
-        <select class="uvu-borders" style="padding: 5px 0 6px 0;" v-model="selectedStudent">
-            <option v-for="student in students" :value="student.UVID">{{ student.name }}</option>
-        </select>
-      </div>
     </div>
-  </div>
+</div>
+<script>
+  /* global Vue */
 
-  <script>
-    /* global Vue */
-    /* global axios */
-    let app = new Vue({
-      el: '#app',
-      data: {
-        assignmentName: null,
-        totalPts: 0,
-        rules: [],
-        //GUI state variables
-        students: [],
-        selectedStudent: null,
-        selectedRules: [],
-        deletedRules: [],
-        addNum: 0,
-        addDesc: null,
-        plusFormActive: false,
-        editTitle: false
-      },
-      filters: {
-        positive: function(num) {
-          if (num > 0) return `+${num}`;
-          return num;
-        }
-      },
-      computed: {
-        actualPts: function() { //add up all selected pts and subtract from totalPts
-          return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
-        },
-        pointsSuccess: function(){
-            return this.actualPts >= this.totalPts;
-        }
-      },
-      methods: {
-        removeRule: function(i) {
-            this.deletedRules.push(this.rules.splice(i,1)[0]);
-        },
-        restoreRule: function() {
-            if (this.deletedRules.length > 0) this.rules.push(this.deletedRules.pop());
-        },
-        addRule: function(){
-          if (this.addNum === 0 || this.addDesc === "") return;
-          this.rules.push({ pts: Number(this.addNum), desc: this.addDesc});
-          this.addNum = null;
-          this.addDesc = null;
-          this.plusFormActive = false;
-        },
-        saveLab: function(){
-            axios.post('http://localhost:3000/assignments', {//TODO json-server won't upsert information with PUT, it only inserts.
-                    id: this.assignmentName,
-                    totalPts: this.totalPts,
-                    rules: this.rules
-            })
-            .then(function (res) {
-                console.log(res);
-            })
-            .catch(function (err) {
-                console.log(err);
-            });
-        },
-        saveGrading: function(){
-            if (this.selectedStudent === null) return;
-            axios.post(`http://localhost:3000/grading`, { //TODO json-server won't upsert information with PUT, it only inserts.
-                id: `${this.assignmentName}-${this.selectedStudent}`,
-                assignmentName: this.assignmentName,
-                UVID: this.selectedStudent,
-                totalPts: this.totalPts,
-                actualPts: this.actualPts,
-                selectedRules: this.selectedRules
-            })
-            .then(function (res) {
-                console.log(res);
-            })
-            .catch(function (err) {
-                console.log(err);
-            });
-        }
-      },
-      created: function(){
-        let self = this;    //closure - captures the scope of all the variables of 'this' which is the 'created' function.
 
-        //Grab Lab1 info
-        axios.get('http://localhost:3000/assignments/Lab1') //TODO dynamically fetch data based on the lab id (Lab1)
-        .then(function(res){
-            console.log(res.data);
-            self.assignmentName = res.data.id;
-            self.totalPts = res.data.totalPts;
-            self.rules = res.data.rules;
-        })
-        .catch(function(err){
-            console.log(err);
-        });
-
-        //Grab students for grading
-        axios.get('http://localhost:3000/students')
-        .then(function(res){
-            console.log(res.data);
-            self.students = res.data;
-        })
-        .catch(function(err){
-            console.log(err);
-        });
+  let app = new Vue({
+    el: '#app',
+    data: {
+      assignmentName: 'Lab 1',
+      totalPts: 100,
+      reqs: [
+        {
+          pts: -1,
+          desc: 'wrong file name'
+        },
+        {
+          pts: -5,
+          desc: 'magic number'
+        },
+        {
+          pts: +1,
+          desc: 'Extra credit'
+        }
+      ],
+      selectedReqs: []
+    },
+    filters: {
+      positive: function (num) { //TODO make all caps
+        if (num > 0) return `+${num}`;
+        return num;
       }
-    });
+    },
+    computed: {
+      actualPts: function() { //add up all selected pts and subtract from totalPts
+        return this.selectedReqs.reduce((acc, el) => acc + el.pts, this.totalPts);
 
-    //TEAM MILESTONE
-    //TODO save (storing the json) via axios                -- Joseph Stoops
-    //TODO recover/restore deleted rule in memory stack     -- Joseph Stoops
-    //TODO edit rule
-    //TODO edit name                                        -- Joseph Stoops
-    //TODO edit totalPts
-    //TODO list of comments (no points up or down)
-    //TODO edit list of comments (no points up or down)
-    //TODO delete list of comments/recovering
-    //TODO create a new assignment                          -- Joseph Stoops
+        //   let sum = this.totalPts;
+        //   for (req of this.selectedReqs) {
+        //       sum += req.pts;
+        //   }
+        //   return sum;
+      }
+    }
+  })
 
+  //THIS MILESTONE
+  //TODO show '+'' before positive Numbers
+  //REFACTOR rename reqs to rules
 
-    //ITEMS TO TACKLE IN THE FUTURE
-    //TODO add a error message that fades away. (save grading with no student selected, restore rule from empty array, etc.)
-    //TODO
-  </script>
+  //FUTURE
+  //TODO display total points possible
+  //TODO sum up the points as actual point
+  //TODO green "full points" (or better) and yellow when points taken off
+
+  //TODO remove rule
+  //STRETCH bootstrap 4
+
+  //TODO add new rule
+
+  //TODO edit rule
+  //TODO create a new assignment
+  //TODO save (storing the json)
+  //TODO load (reading the json)
+  //TODO partial credit
+  //TODO late penalty percentage
+  //TODO tie to Canvas API
+  //TODO
+</script>
 </body>
-
 </html>
