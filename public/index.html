@@ -96,6 +96,14 @@
         students: [],
         selectedStudent: null,
         selectedRules: [],
+		commentsObj: {
+            comments: [],
+            newComment: "",
+            deleted: {}
+        },
+        deletedComments: [],//don't save/load me. I'm ephemeral
+        activeCommentEdit: null,
+        activeCommentEditText: null
         deletedRules: [],
         addNum: 0,
         addDesc: null,
