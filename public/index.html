@@ -222,7 +222,7 @@
             self.assignmentName = res.data.id;
             self.totalPts = res.data.totalPts;
             self.rules = res.data.rules;
-            self.commentsObj = res.data.commentsObj;
+            self.comment = res.data.commentsObj;
         })
         .catch(function(err){
             console.log(err);
