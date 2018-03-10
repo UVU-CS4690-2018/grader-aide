@@ -80,6 +80,29 @@
             <option v-for="student in students" :value="student.UVID">{{ student.name }}</option>
         </select>
       </div>
+	  <!-- comments div-->
+	<div class="col-xl-3 card commentPadding">
+		<ul class="list-group list-group-flush mb-1">
+			<li v-for="(comment, i) of commentsObj.comments" class="list-group-item">
+				<div v-if="i != activeCommentEdit">
+					<img src="img/xRed.svg" class="float-right clickable" @click="removeComment(i)" title="Remove Comment">
+					<img src="img/pencilBlack.svg" class="float-right clickable mr-1" @click="editComment(i)" title="Edit Comment">
+				  {{comment.comment}}
+				</div>
+				<div v-if="i == activeCommentEdit">
+					<input type="text" class="form-control" v-model="activeCommentEditText">
+					<input type="submit" @click="submitEditedComment(i)" class="btn btn-primary mt-1" >
+				</div>
+			</li>
+			<b class="card-title ml-3 mt-3 mb-1">New Comment</b>
+			<div @click="addComment()">
+				<input type="text" placeholder="..." class="form-control" v-model="commentsObj.newComment">
+				<input type="submit" class="btn btn-primary mt-1" >
+				<span v-if="deletedComments.length" class="btn btn-primary clickable float-right mt-1" @click="restoreComment()">undo </span>
+			</div>
+
+		</ul>
+	</div>
     </div>
   </div>
 
@@ -100,7 +123,15 @@
         addNum: 0,
         addDesc: null,
         plusFormActive: false,
-        editTitle: false
+        editTitle: false,
+		commentsObj: {
+            comments: [],
+            newComment: "",
+            deleted: {}
+        },
+        deletedComments: [],//don't save/load me. I'm ephemeral
+        activeCommentEdit: null,
+        activeCommentEditText: null
       },
       filters: {
         positive: function(num) {
@@ -159,6 +190,27 @@
             .catch(function (err) {
                 console.log(err);
             });
+        },
+        addComment: function() {
+          if (this.commentsObj.newComment == "") return;
+          this.commentsObj.comments.push({comment: this.commentsObj.newComment, date: new Date()});
+          this.commentsObj.newComment = "";
+        },
+        removeComment: function(i) {
+          this.deletedComments.push(this.commentsObj.comments[i]);
+          this.commentsObj.comments.splice(i, 1);
+        },
+        restoreComment: function() {
+          this.commentsObj.comments.push(this.deletedComments.pop());
+        },
+        editComment: function(i) {
+          this.activeCommentEdit = i;
+          this.activeCommentEditText = this.commentsObj.comments[i].comment;
+        },
+        submitEditedComment: function(i) {
+          this.commentsObj.comments[i].comment = this.activeCommentEditText;
+          this.activeCommentEditText = null;
+          this.activeCommentEdit = null;
         }
       },
       created: function(){
@@ -171,6 +223,7 @@
             self.assignmentName = res.data.id;
             self.totalPts = res.data.totalPts;
             self.rules = res.data.rules;
+            self.commentsObj = res.data.commentsObj;
         })
         .catch(function(err){
             console.log(err);
