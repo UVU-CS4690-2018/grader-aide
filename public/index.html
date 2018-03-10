@@ -39,7 +39,8 @@
 
         <!-- Amount of points title and the add and edit buttons -->
         <div class="row">
-          <h4 class="col-3">{{totalPts}} pts</h4>
+          <h4 v-if="!editTotalPoints" class="col-3" @dblclick="editTotalPoints = true">{{totalPts}} pts</h4>
+          <input v-else class="col-3" type="text" v-model="totalPts" @keyup.enter="editTotalPoints = false">
           <span class="col-2 offset-7 float-right">
             <img src="img/undoBlack.svg" class="clickable float-right" @click="restoreRule()" title="Restore Rule">
             <img src="img/plusGreen.svg" v-show="!plusFormActive" class="clickable float-right" @click="plusFormActive=true" title="Add Rule">
@@ -134,7 +135,8 @@
         ruleSpans: [],
         deletedRuleSpans: [],
         ruleDivCount: 0,
-        ruleEdit: false
+        ruleEdit: false,
+          editTotalPoints: false
       },
       filters: {
         positive: function(num) {
