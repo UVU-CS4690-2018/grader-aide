@@ -19,5 +19,8 @@
   "homepage": "https://github.com/UVU-CS4690-2018/grader-aide#readme",
   "devDependencies": {
     "json-server": "^0.12.1"
+  },
+  "dependencies": {
+    "clipboard": "^2.0.0"
   }
 }
