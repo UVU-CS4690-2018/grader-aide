@@ -35,14 +35,32 @@
 <body>
   <div id="app">
     <edit-modal :modal-id="modalId" :rules="rules"></edit-modal>
-    
+
     <div class="assignment-container main-background">
       <div class="container">
         <div class="row">
           <div class="col s12">
             <div class="card">
               <div class="card-content">
-                <span class="card-title main-card">{{assignmentName}}</span>
+
+                <!-- INLINE assignment name editing -->
+                <template v-if="!assignmentEditable">
+                  <span class="card-title main-card" @click="assignmentEditable = true">{{ assignmentName }}
+                </template>
+                <template v-else>
+                  <input class="card-title main-card" v-model="assignmentName" v-on:keyup.enter="updateAssignmentName()" v-on:blur="updateAssignmentName()">
+                </template>
+
+                <!-- INLINE total points editing -->
+                <template v-if="!totalPtsEditable">
+                  <h5 @click="totalPtsEditable = true">Total Points Possible: {{totalPts}}</h5>
+                </template>
+                <template v-else>
+                  <h5 style="display:inline;">Total Points Possible:
+                    <input style="width:100px; font-size:24px;" type="number" v-model="totalPts" v-on:keyup.enter="updateTotalPts()" v-on:blur="updateTotalPts()"
+                    />
+                  </h5>
+                </template>
                 <div class="divider"></div>
                 <div class="row">
                   <!-- accordian card -->
@@ -75,12 +93,9 @@
                       </li>
 
                       <button class="btn waves-effect waves-light z-depth-0 green" type="submit" name="action" @click="selectAll()">All</button>
-                      <a
-                        class="btn waves-effect waves-light z-depth-0 yellow black-text right modal-trigger" 
-                        :href="`#${modalId}`"
-                      >
+                      <a class="btn waves-effect waves-light z-depth-0 yellow black-text right modal-trigger" :href="`#${modalId}`">
                         <i class="material-icons">mode_edit</i>
-                    </a>
+                      </a>
                       <button class="btn waves-effect waves-light z-depth-0 red right" type="submit" @click="resetChecked()" name="action">Reset</button>
                     </ul>
 
@@ -92,13 +107,13 @@
                       <div id="summary-card" class="card-content">
                         <ul class="collection with-header">
                           <li class="collection-header">
-                            <h4>Rules</h4>
+                            <h5>Rules</h5>
                           </li>
                           <li class="collection-item" v-for="rule of selectedRules">{{rule.pts | handlePositive}} {{rule.desc}}</li>
                         </ul>
                         <ul class="collection with-header">
                           <li class="collection-header">
-                            <h4>Comments</h4>
+                            <h5>Comments</h5>
                           </li>
                           <li class="collection-item" v-for="comment of selectedComments">{{comment.pts}} {{comment.desc}}</li>
                         </ul>
@@ -124,7 +139,7 @@
 
 <!-- initialize modal for for display -->
 <script>
-  $(document).ready(function(){
+  $(document).ready(function () {
     // the "href" attribute of the modal trigger must specify the modal ID that wants to be triggered
     $('.modal').modal();
   });
@@ -138,6 +153,8 @@
       assignmentID: '3b706b34-8bc4-4b30-aea7-9a3f9018f8fc',
       assignmentName: 'Lab 1',
       totalPts: 100,
+      assignmentEditable: false,
+      totalPtsEditable: false,
       rules: [
         { id: 'ce5e019c-44e7-4c75-8309-496599bd7c64', pts: -1, desc: 'Test test test', checked: false },
         { id: '1678d1d2-fdec-41c7-8982-3d7e42eb4c99', pts: -5, desc: 'Hello World', checked: false },
@@ -243,6 +260,16 @@
           console.log("window text copied");
 
         }
+      },
+      updateAssignmentName() {
+        console.log(event);
+        this.assignmentEditable = false;
+        //TODO update assignment name in database
+      },
+      updateTotalPts() {
+        console.log(event);
+        this.totalPtsEditable = false;
+        //TODO update totalPts in database
       }
 
 
@@ -262,21 +289,35 @@
     },
     created: function () {
     }
-  })
+  });//end app = new Vue
+
+
+
+
+
+  //   var stack = [];
+  //   stack.push(2);       // stack is now [2]
+  //   stack.push(5);       // stack is now [2, 5]
+  //   var i = stack.pop(); // stack is now [2]
+  //   alert(i);            // displays 5
+
+  //   var queue = [];
+  //   queue.push(2);         // queue is now [2]
+  //   queue.push(5);         // queue is now [2, 5]
+  //   var i = queue.shift(); // queue is now [5]
+  //   alert(i);              // displays 2
 
 
 
   // At a minimum, complete these
+    // save(storing the json) via axios
+    // recover / restore deleted rule in memory stack
+    // edit rule desc / points
+    // edit list of comments(no points up or down)
+    // delete list of comments / recovering
+    // create a new assignment
 
-  // save(storing the json) via axios
-  // recover / restore deleted rule in memory stack
-  // edit rule
-  // edit name
-  // edit totalPts
-  // list of comments(no points up or down)
-  // edit list of comments(no points up or down)
-  // delete list of comments / recovering
-  // create a new assignment
+
   // You can add other features at will.You can improve the look.The design is up to you.For example, for editing an assignment, you could do in place or modal or a hybrid.
 
 

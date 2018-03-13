@@ -51,17 +51,17 @@
       </table> -->
     </div>
     <div class="modal-footer">
-      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Confirm</a>
     </div>
   </div>
 </template>
 
 <script>
-  module.exports =  {
+module.exports = {
     props: {
-      modalId: { type: String, required: true },
-      rules: { type: Array, required: true },
-      // coments: { type: Array, required: true },
+        modalId: { type: String, required: true },
+        rules: { type: Array, required: true }
+        // coments: { type: Array, required: true },
     },
     data() {
       return {
@@ -98,5 +98,5 @@
       this.editableRules = this.deepCopy(this.rules)
       this.editableRules.push({ desc: '', pts: null })
     }
-  }
+};
 </script>
