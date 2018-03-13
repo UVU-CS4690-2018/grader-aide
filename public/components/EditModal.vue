@@ -25,44 +25,44 @@
       <p>A bunch of text</p>
     </div>
     <div class="modal-footer">
-      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Confirm</a>
     </div>
   </div>
 </template>
 
 <script>
-  module.exports =  {
+module.exports = {
     props: {
-      modalId: { type: String, required: true },
-      rules: { type: Array, required: true },
-      // coments: { type: Array, required: true },
+        modalId: { type: String, required: true },
+        rules: { type: Array, required: true }
+        // coments: { type: Array, required: true },
     },
     data() {
-      return {
-        editableRules: [],
-        editableComments: []
-      }
+        return {
+            editableRules: [],
+            editableComments: []
+        };
     },
     methods: {
-      deepCopy(arr) {
-        return JSON.parse(JSON.stringify(arr))
-      },
-      // mutates rule in place
-      cleanRuleAfterEdit(rule) {
-        // clean pts
-        // todo pts validation is not done yet but in progress
-        // const invalidNumVal = /(?!(^-))\D+/g
-        // const cleanPts = rule.pts.replace(invalidNumVal, '')
-        // console.log(cleanPts)
-        // rule.pts = parseInt(cleanPts)
-        
-        // clean rule
-        rule.desc = rule.desc.trim().replace(/\s+/g, ' ')
-        console.log(rule) // fixme remove
-      }
+        deepCopy(arr) {
+            return JSON.parse(JSON.stringify(arr));
+        },
+        // mutates rule in place
+        cleanRuleAfterEdit(rule) {
+            // clean pts
+            // todo pts validation is not done yet but in progress
+            // const invalidNumVal = /(?!(^-))\D+/g
+            // const cleanPts = rule.pts.replace(invalidNumVal, '')
+            // console.log(cleanPts)
+            // rule.pts = parseInt(cleanPts)
+
+            // clean rule
+            rule.desc = rule.desc.trim().replace(/\s+/g, ' ');
+            console.log(rule); // fixme remove
+        }
     },
     created() {
-      this.editableRules = this.deepCopy(this.rules)
+        this.editableRules = this.deepCopy(this.rules);
     }
-  }
+};
 </script>
