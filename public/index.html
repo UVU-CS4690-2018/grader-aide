@@ -10,6 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
     <!-- TODO -->
     <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -25,14 +28,17 @@
 
 
     <div class="container" id="app">
+        <div class="row" style="margin-top: 15px; color: #9e9e9e;">
+            <div class="col align-self-center text-center collapse" id="collapseExample">To undo delete: <span style="color: orange;">Ctrl+Z</span></div>
+        </div>
         <div class="row">
-
             <!-- title row -->
+
             <div class="col-xl-6 offset-xl-3 margMain">
         <div class="container">
           <div class="row">
             <h2 v-if="!editName" class="assignmentName" @click="editName = !editName;">{{name}}</h2>
-            <input style="width: 50%" v-else class="editName" type="text" v-model="name">
+            <input style="width: 50%" v-else class="editName textInput" type="text" v-model="name">
             <span v-if="editName" style="padding: 15px;" class="clickable" @click="editName = !editName;">💾</span>
             <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editName = !editName;" class="clickable">
           </div>
@@ -41,7 +47,7 @@
         <div class="container">
           <div class="row">
             <h4 v-if="!editTotalPts" @click="editTotalPts = !editTotalPts;">{{totalPts}}<span class="ptsPts"> pts</span></h4>
-            <input v-else style="width: 20%" class="editTotalPts" type="number" v-model.number="totalPts">
+            <input v-else style="width: 20%" class="editTotalPts textInput" type="number" v-model.number="totalPts">
             <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts;">💾</span>
             <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editTotalPts = !editTotalPts;" class="clickable">
           </div>
@@ -72,12 +78,18 @@
                     <b>Good Job</b>
                     <hr> {{actualPts}}
                 </div>
+                <button @click="saveChanges()" class="btn btn-success">
+                    Save
+                </button>
+                <button @click="createNewAssignment()" class="btn btn-primary">
+                    Create Assignment
+                </button>
             </div>
         </div>
     </div>
-
     <script>
-Vue.component('rule', {
+
+    Vue.component('rule', {
 
     props: ['rule', 'index'],
     template: `
@@ -87,8 +99,8 @@ Vue.component('rule', {
                         <span class="slider round"></span>
                     </label>
                     <div class="col-9">
-                        <span v-if="!edit" @click="edit = !edit;" style="color: black"><span style="padding-right: 15px; color: white; font-weight: bolder;">{{rule.pts | positive}}</span> {{rule.desc}}</span>
-                        <span v-else><input style="width: 50px" type="number" v-model="locPts"><input style="width: 75%" type="text" v-model="locDesc"></span>
+                        <span v-if="!edit" @click="edit = !edit;" style="color: white"><span style="padding-right: 15px; color: white; font-weight: bolder;">{{rule.pts | positive}}</span> {{rule.desc}}</span>
+                        <span v-else><input style="width: 50px" class="textInput" type="number" v-model="locPts"><input style="width: 75%" type="text" class="textInput" v-model="locDesc"></span>
                     </div>
                     <div class="col">
                         <img src="img/xRed.svg" class="clickable float-right removeButton" @click="remove" title="Remove">
@@ -103,7 +115,8 @@ Vue.component('rule', {
             edit: false,
             locDesc: this.rule.desc,
             locPts: this.rule.pts,
-            checked: false
+            checked: false,
+            shownUndoTip: false
         }
     },
     filters: {
@@ -113,9 +126,23 @@ Vue.component('rule', {
         }
     },
     methods: {
+        undo: function(e) {
+            alert("entered function");
+            if(e.ctrlKey  &&  e.code === "KeyZ") {
+                alert("vue ctrl+z");
+            }
+        },
         remove: function () {
             this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
             this.$emit('deleterule', {index: this.index});
+            if(!this.shownUndoTip) {
+                $('.collapse').collapse();
+                this.shownUndoTip = true;
+                setTimeout(
+                    function() {
+                        $('.collapse').collapse('hide');
+                    }, 3000);
+            }
         },
         editvalues: function () {
             this.edit = !this.edit;
@@ -144,85 +171,88 @@ Vue.component('rule', {
     }
 })
 
-        let app = new Vue({
-            el: '#app',
-            data: { //persisted data
-                name: null,
-                totalPts: 0,
-                rules: [],
-                //temporary gui state
-                selectedRules: [],
-                addNum: null,
-                addDesc: null,
-    plusFormActive: false,
-      editName: false,
-      editTotalPts: false
-            },
-            filters: {
-    positive: function(num) {
-                    if (num > 0) return `+${num}`;
-                    return num;
-                }
-            },
-            computed: {
-                actualPts: function() { //add up all selected pts and subtract from totalPts
-                    return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
-                }
-            },
-            methods: {
-    deleteRule: function(payload) {
-      this.rules.splice(payload.index,1);
-      // TODO, add rule to memory stack of deleted rules...
-                },
-                addRule: function() {
-                    if (!this.addNum) return;
-                    if (!this.addDesc) return;
-                    this.rules.push({
-                        pts: this.addNum,
-                        desc: this.addDesc
-                    });
-                    this.addNum = null;
-                    this.addDesc = null;
-                    this.plusFormActive = false;
+let app = new Vue({
+    el: '#app',
+    data: { //persisted data
+        name: null,
+        totalPts: 0,
+        rules: [],
+        //temporary gui state
+        selectedRules: [],
+        addNum: null,
+        addDesc: null,
+        deletedRuleStack: [],
+        plusFormActive: false,
+        editName: false,
+        editTotalPts: false
     },
-      checkrule: function (payload) {
-          this.selectedRules.push({id: payload.id, pts: payload.rule.pts, desc: payload.rule.desc});
-      },
-      uncheckrule: function (payload) {
-          this.selectedRules = this.selectedRules.filter(function( obj ) {
-              return obj.id !== payload.id;
-          });
-      },
-      ruleChanged: function (payload) {
-          let rule = this.rules[payload.index];
-          rule.desc = payload.desc;
-          rule.pts = parseInt(payload.pts);
-      }
-            },
-            created: function() {
-                let self = this;
-                axios.get('lab1.json')
-                    .then(function(response) {
-                        self.name = response.data.name;
-                        self.totalPts = response.data.totalPts;
-                        self.rules = response.data.rules;
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                    });
+    filters: {
+        positive: function(num) {
+            if (num > 0) return `+${num}`;
+            return num;
+        }
+    },
+    computed: {
+        actualPts: function() { //add up all selected pts and subtract from totalPts
+            return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+        }
+    },
+    methods: {
+    deleteRule: function(payload) {
+      this.deletedRuleStack.push(this.rules.splice(payload.index,1));
+    },
+    addRule: function() {
+        if (!this.addNum) return;
+        if (!this.addDesc) return;
+        this.rules.push({
+            pts: this.addNum,
+            desc: this.addDesc
+        });
+        this.addNum = null;
+        this.addDesc = null;
+        this.plusFormActive = false;
+    },
+    checkrule: function (payload) {
+      this.selectedRules.push({id: payload.id, pts: payload.rule.pts, desc: payload.rule.desc});
+    },
+    uncheckrule: function (payload) {
+      this.selectedRules = this.selectedRules.filter(function( obj ) {
+          return obj.id !== payload.id;
+      });
+    },
+    ruleChanged: function (payload) {
+      let rule = this.rules[payload.index];
+      rule.desc = payload.desc;
+      rule.pts = parseInt(payload.pts);
+    },
+    saveChanges: function (event) {
+      alert('saving changes');
+    },
+    createNewAssignment: function() {
+      alert('creating new assignment');
+    }
+    },
+        created: function() {
+            let self = this;
+            window.addEventListener('keydown', function(event) {
+                // If Ctrl+Z is pressed
+                if (event.ctrlKey && event.code == "KeyZ" && self.deletedRuleStack.length > 0) {
+                    let newRule = self.deletedRuleStack.pop();
+                    self.rules.push({pts: newRule[0].pts, desc: newRule[0].desc});
+                }
+            });
+            axios.get('lab1.json')
+                .then(function(response) {
+                    self.name = response.data.name;
+                    self.totalPts = response.data.totalPts;
+                    self.rules = response.data.rules;
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
             }
         })
 
-        //CLASS MILESTONE
-        //REFACTOR prettify the text boxes, can we use regEx to filter what's allowed
-        //REFACTOR the two output <div> sections into one
-        //FIXME if rule is checked, and then deleted, it's still listed in summary
-        //REFACTOR pop up the add line
-
-        //FUTURE
-        //TODO partial credit
-        //TODO late penalty percentage
-        //TODO tie to Canvas API
     </script>
 </body>
 

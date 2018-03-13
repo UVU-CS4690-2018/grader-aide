@@ -85,10 +85,9 @@ label {
 }
 
 .textInput {
-    background-color: #f7f7f7;
-    height: 45px;
+    background-color: #29363f;
     border: 2px solid #315269;
-    color: black;
+    color: white;
 }
 
 .centered {
@@ -560,7 +559,6 @@ input:checked + .slider:before {
     font-family: inherit;
     font-weight: 500;
     line-height: 1.2;
-    color: black;
 }
 .editTotalPts {
     font-size: 1.5rem;
@@ -568,7 +566,6 @@ input:checked + .slider:before {
     font-family: inherit;
     font-weight: 500;
     line-height: 1.2;
-    color: black;
 }
 
 .margMain {
