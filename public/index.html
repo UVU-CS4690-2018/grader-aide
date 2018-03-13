@@ -126,12 +126,6 @@
         }
     },
     methods: {
-        undo: function(e) {
-            alert("entered function");
-            if(e.ctrlKey  &&  e.code === "KeyZ") {
-                alert("vue ctrl+z");
-            }
-        },
         remove: function () {
             this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
             this.$emit('deleterule', {index: this.index});
@@ -236,7 +230,8 @@ let app = new Vue({
             let self = this;
             window.addEventListener('keydown', function(event) {
                 // If Ctrl+Z is pressed
-                if (event.ctrlKey && event.code == "KeyZ" && self.deletedRuleStack.length > 0) {
+                console.log(event.code);
+                if (event.ctrlKey && event.keyCode == 90 && self.deletedRuleStack.length > 0) {
                     let newRule = self.deletedRuleStack.pop();
                     self.rules.push({pts: newRule[0].pts, desc: newRule[0].desc});
                 }
