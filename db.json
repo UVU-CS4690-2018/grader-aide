@@ -6,19 +6,23 @@
       "rules": [
         {
           "pts": -1,
-          "desc": "wrong file name"
+          "desc": "wrong file name",
+          "editing": false
         },
         {
           "pts": -5,
-          "desc": "magic number"
+          "desc": "magic number",
+          "editing": false
         },
         {
           "pts": 1,
-          "desc": "Extra credit"
+          "desc": "Extra credit",
+          "editing": false
         },
         {
           "pts": -100,
-          "desc": "Plagiarism"
+          "desc": "Plagiarism",
+          "editing": false
         }
       ]
     }
@@ -119,10 +123,12 @@
   "commentsObj": {
     "comments": [
       {
-        "comment": "Comment1", "date": null
+        "comment": "Comment1",
+        "date": null
       },
       {
-        "comment": "What would you do for a klondike bar?", "date": null
+        "comment": "What would you do for a klondike bar?",
+        "date": null
       }
     ]
   }
