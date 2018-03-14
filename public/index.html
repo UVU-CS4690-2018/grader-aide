@@ -92,7 +92,7 @@
                                 </button>
                                 <button class="btn btn-light btn-sm"
                                         v-if="!createNew"
-                                        @click="showModal()">
+                                        @click="newAssignment()">
                                     Create
                                 </button>
                             </ul>
@@ -445,6 +445,13 @@
                 this.modalTitle = "Edit Assignment";
                 this.showModal();
             },
+            newAssignment: function () {
+                this.assignment.id = null;
+                this.assignment.points = 0;
+                this.assignment.editIdx = -1;
+                this.modalTitle = "New Assignment";
+                this.showModal();
+            },
             saveState: function () {
                 console.log(this.assignments);
                 let obj = {
@@ -496,16 +503,16 @@
     //FIXME if rule is checked, and then deleted, it's still listed in summary
 
     //TEAM MILESTONE
-    //TODO save (storing the json) via axios
-    //TODO recover/restore deleted rule in memory stack --DONE NT
+    //TODO save (storing the json) via axios - need to talk with Prof. about why not working
+    //TODO recover/restore deleted rule in memory stack --DONE
     //TODO edit rule
-    //TODO edit name --DONE NT
-    //TODO edit totalPts --DONE NT
+    //TODO edit name --DONE
+    //TODO edit totalPts --DONE
     //TODO list of comments (no points up or down) DONE
-    //TODO edit list of comments (no points up or down)
-    //TODO delete list of comments/recovering
-    //TODO create a new assignment --DONE NT
-    //TODO create newAssignement function same as edit.
+    //TODO edit list of comments (no points up or down) DONE
+    //TODO delete list of comments/recovering DONE
+    //TODO create a new assignment --DONE
+    //TODO create newAssignment function same as edit. DONE
 
     //FUTURE
     //TODO load (reading the json)
