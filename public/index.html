@@ -15,7 +15,7 @@
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
   <!-- axios -->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+  <script type="text/javascript" src="https: //cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
 
   <!-- custom js -->
   <script type="text/javascript" src="common-functions.js"></script>
@@ -31,6 +31,7 @@
   <!-- custom styles -->
   <link rel="stylesheet" href="assets/styles/styles.css">
 </head>
+
 
 <body>
   <div id="app">
@@ -155,15 +156,40 @@
       totalPts: 100,
       assignmentEditable: false,
       totalPtsEditable: false,
-      rules: [
-        { id: 'ce5e019c-44e7-4c75-8309-496599bd7c64', pts: -1, desc: 'Test test test', checked: false },
-        { id: '1678d1d2-fdec-41c7-8982-3d7e42eb4c99', pts: -5, desc: 'Hello World', checked: false },
-        { id: 'bd2ab547-10c9-45e0-8169-c8e7355a5e4e', pts: 1, desc: 'Extra credit', checked: false }
+      rules: [{
+          id: 'ce5e019c-44e7-4c75-8309-496599bd7c64',
+          pts: -1,
+          desc: 'Test test test',
+          checked: false
+        },
+        {
+          id: '1678d1d2-fdec-41c7-8982-3d7e42eb4c99',
+          pts: -5,
+          desc: 'Hello World',
+          checked: false
+        },
+        {
+          id: 'bd2ab547-10c9-45e0-8169-c8e7355a5e4e',
+          pts: 1,
+          desc: 'Extra credit',
+          checked: false
+        }
       ],
-      comments: [
-        { id: '4163d23c-6bff-43ea-90b4-751012e52582', desc: 'This is comment one', checked: false },
-        { id: '006bfd49-04de-408c-8817-b5733777fb23', desc: 'lorem ipsum', checked: false },
-        { id: '241a2814-ec4f-448c-a8d8-6ebb7d4b35a2', desc: 'A bird in the hand is worth two in the bush', checked: false }
+      comments: [{
+          id: '4163d23c-6bff-43ea-90b4-751012e52582',
+          desc: 'This is comment one',
+          checked: false
+        },
+        {
+          id: '006bfd49-04de-408c-8817-b5733777fb23',
+          desc: 'lorem ipsum',
+          checked: false
+        },
+        {
+          id: '241a2814-ec4f-448c-a8d8-6ebb7d4b35a2',
+          desc: 'A bird in the hand is worth two in the bush',
+          checked: false
+        }
       ],
       // gui state
       allSelected: false,
@@ -173,8 +199,7 @@
       handlePositive: function (value) {
         if (value > 0) {
           return '+' + value;
-        }
-        else return value;
+        } else return value;
       }
     },
     methods: {
@@ -183,13 +208,13 @@
       },
       createAssignment() {
         axios.post(`/assignments/`, {
-          id: this.assignmentID,
-          name: this.assignmentName,
-          totalPts: this.totalPts,
-          nextRuleID: this.nextRuleID,
-          rules: this.rules,
-          comments: this.comments
-        })
+            id: this.assignmentID,
+            name: this.assignmentName,
+            totalPts: this.totalPts,
+            nextRuleID: this.nextRuleID,
+            rules: this.rules,
+            comments: this.comments
+          })
           .then(function (response) {
             //console.log(response);
           })
@@ -199,13 +224,13 @@
       },
       updateAssignment() {
         axios.put(`/assignments/${this.assignmentID}`, {
-          id: this.assignmentID,
-          name: this.assignmentName,
-          totalPts: this.totalPts,
-          nextRuleID: this.nextRuleID,
-          rules: this.rules,
-          comments: this.comments
-        })
+            id: this.assignmentID,
+            name: this.assignmentName,
+            totalPts: this.totalPts,
+            nextRuleID: this.nextRuleID,
+            rules: this.rules,
+            comments: this.comments
+          })
           .then(function (response) {
             //console.log(response);
           })
@@ -221,8 +246,7 @@
           for (let comment of this.comments) {
             comment.checked = true;
           }
-        }
-        else {
+        } else {
           for (let rule of this.rules) {
             rule.checked = false;
           }
@@ -271,25 +295,21 @@
         this.totalPtsEditable = false;
         //TODO update totalPts in database
       }
-
-
-    },
+    }, //end methods
     computed: {
       selectedRules() {
         return this.rules.filter(rule => rule.checked)
       },
       selectedComments() {
         return this.comments.filter(comment => comment.checked)
-
       }
     },
     components: {
       'hello-world': httpVueLoader('./components/HelloWorld.vue'),
       EditModal: httpVueLoader('./components/EditModal.vue')
     },
-    created: function () {
-    }
-  });//end app = new Vue
+    created: function () {}
+  }); //end app = new Vue
 
 
 
@@ -310,18 +330,15 @@
 
 
   // At a minimum, complete these
-    // save(storing the json) via axios
-    // recover / restore deleted rule in memory stack
-    // edit rule desc / points
-    // edit list of comments(no points up or down)
-    // delete list of comments / recovering
-    // create a new assignment
+  // save(storing the json) via axios
+  // recover / restore deleted rule in memory stack
+  // edit rule desc / points
+  // edit list of comments(no points up or down)
+  // delete list of comments / recovering
+  // create a new assignment
 
 
   // You can add other features at will.You can improve the look.The design is up to you.For example, for editing an assignment, you could do in place or modal or a hybrid.
-
-
-
 </script>
 
 </html>
