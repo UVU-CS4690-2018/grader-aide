@@ -5,148 +5,250 @@
   <meta charset="UTF-8">
   <title>GraderAide</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.min.js"></script>
   <style>
-     .clickable { /* TODO */
+      body {
+          /* Same as UVU.edu */
+          font-family: "stratum-1-web", Arial, "Lucida Grande", sans-serif;
+      }
+     .clickable {
        cursor: pointer;
      }
+     .uvu-borders {
+         border: 1px solid #275d39;
+         border-radius: 5px;
+     }
+     .uvu-button {
+         background-color: #275d39;
+         color: white;
+         font-weight: bold;
+         border: 1px solid #275d39;
+         border-radius: 5px;
+         padding: 5px 20px 5px 20px;
+     }
+      /* UVU Green: #275d39 */
   </style>
-  
-  <script src="https://cdn.jsdelivr.net/npm/vue"></script><!-- TODO -->
 </head>
-
 <body>
   <div class="container" id="app">
     <div class="row">
-      
-      <!-- title row -->
-      <div class="col-xl-6 offset-xl-3">
-        <h1>{{assignmentName}}</h1><!-- TODO -->
-        <h4>{{totalPts}} pts</h4>
+      <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
+        <h1 v-if="!editTitle" @dblclick="editTitle = true">{{ assignmentName }} <img src="img/pencilBlack.svg" @click="editTitle = true" title="Edit Title"></h1>
+        <input v-else type="text" v-model="assignmentName" @keyup.enter="editTitle = false">
 
-        <!-- rules rows -->
-        <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
+        <!-- Amount of points title and the add and edit buttons -->
+        <div class="row">
+          <h4 v-if="!editTotalPoints" class="col-3" @dblclick="editTotalPoints = true">{{totalPts}} pts <img src="img/pencilBlack.svg" @click="editTitle = true" title="Edit Title"></h4>
+          <input v-else class="col-3" type="text" v-model.number="totalPts" @keyup.enter="editTotalPoints = false">
+          <span class="col-2 offset-7 float-right">
+            <img src="img/undoBlack.svg" class="clickable float-right" @click="restoreRule()" title="Restore Rule">
+            <img src="img/plusGreen.svg" v-show="!plusFormActive" class="clickable float-right" @click="plusFormActive=true" title="Add Rule">
+          </span>
+        </div>
+
+        <!-- List of all rules -->
+        <div v-for="(rule, i) of rules" @dblclick="toggleRuleEdit(rule)">
           <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-            {{rule.pts | positive}} {{rule.desc}}
-            <span class="clickable float-right" @click="removeRule(i)" v-html="REDX" title="Remove"></span><br>
+              <span v-if="rule.editing">
+                <input type="text" class="col-xl-2" v-model.number="rule.pts" @keyup.enter.lazy="toggleRuleEdit(rule)" placeholder="Rule Points" title="Rule Points">
+                <input type="text" class="col-xl-7" v-model.trim="rule.desc" @keyup.enter.lazy="toggleRuleEdit(rule)" placeholder="Rule Description" title="Rule description" autofocus>
+              </span>
+              <span v-else>{{rule.pts | positive}} {{rule.desc}}</span>
+              <span class="clickable float-right">
+                <img src="img/pencilBlack.svg" @click="toggleRuleEdit(rule)" title="Edit Rule">
+                <img src="img/xRed.svg" @click="removeRule(i)" title="Remove Rule">
+              </span><br>
           </input>
         </div>
-        
-        <!-- add row -->
-        <input type="number" class="col-xl-2" v-model.number="addNum" title="pts (positive or negative)">
-        <input type="text"   class="col-xl-5" v-model.trim="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
-        <span class="clickable float-right" @click="addRule()" title="Add">+</span><br>
 
-        <!-- output rows -->
-        <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
+        <!-- Add new rule form -->
+        <div v-if="plusFormActive">
+          <input type="text" class="col-xl-2" v-model.number="addNum" @keyup.enter.lazy="addRule()" placeholder="Rule Points" title="Rule Points">
+          <input type="text" class="col-xl-9" v-model.trim="addDesc" @keyup.enter.lazy="addRule()" placeholder="Rule Description" title="Rule description" autofocus>
+          <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Open add fields">
+        </div>
+
+        <!-- Results area -->
+        <hr>
+        <div class="alert" :class="{'alert-success': pointsSuccess, 'alert-warning': !pointsSuccess}" role="alert">
           <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+          <b v-if="pointsSuccess">Good Job</b>
           <hr> {{actualPts}}
         </div>
-        <div v-else class="alert alert-success" role="alert">
-          <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <b>Good Job</b>
-          <hr> {{actualPts}}
-        </div>
+
+        <!-- submit buttons -->
+        <button class="uvu-button" @click="saveLab()">save lab</button>
+        <button class="uvu-button" @click="saveGrading()">save grading</button>
+        <select class="uvu-borders" style="padding: 5px 0 6px 0;" v-model="selectedStudent">
+            <option v-for="student in students" :value="student.UVID">{{ student.name }}</option>
+        </select>
+      </div>
+	  <!-- comments div-->
+      <div class="col-xl-3 card commentPadding">
+        <ul class="list-group list-group-flush mb-1">
+          <li v-for="(comment, i) of commentsObj.comments" class="list-group-item">
+            <div v-if="i != activeCommentEdit">
+              <img src="img/xRed.svg" class="float-right clickable" @click="removeComment(i)" title="Remove Comment">
+              <img src="img/pencilBlack.svg" class="float-right clickable mr-1" @click="editComment(i)" title="Edit Comment">
+              {{comment.comment}}
+            </div>
+            <div v-if="i == activeCommentEdit">
+              <input type="text" class="form-control" v-model="activeCommentEditText">
+              <input type="submit" @click="submitEditedComment(i)" class="btn btn-primary mt-1 uvu-button" >
+            </div>
+          </li>
+          <b class="card-title ml-3 mt-3 mb-1">New Comment</b>
+          <div @click="addComment()" @keyup.enter.lazy="addComment()">
+            <input type="text" placeholder="..." class="form-control" v-model="commentsObj.newComment">
+            <input type="submit" class="btn btn-primary mt-1 uvu-button" >
+            <span v-if="deletedComments.length" class="btn btn-primary clickable float-right mt-1 uvu-button" @click="restoreComment()">undo </span>
+          </div>
+        </ul>
       </div>
     </div>
-<pre>{{addNum}} {{addDesc}}</pre>    
   </div>
 
-<script>
-/* global Vue */
-let app = new Vue({
-  el: '#app',
-  data: { //persisted data
-    assignmentName: 'Lab 1',
-    totalPts: 100,
-    rules: [
-      {pts: -1, desc: 'wrong file name'},
-      {pts: -5, desc: 'magic number'},
-      {pts: +1, desc: 'Extra credit'}
-    ],
-    //gui state
-    REDX: '&#10060;',
-    selectedRules: [],
-    addNum: null,
-    addDesc: null
-  },
-  filters: {
-    positive: function(num) { //TODO make all caps
-      if (num > 0) return `+${num}`;
-      return num;
-    }
-  },
-  computed: {
-    actualPts: function() { //add up all selected pts and subtract from totalPts
-      return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+  <script>
+    /* global Vue */
+    /* global axios */
+    let app = new Vue({
+      el: '#app',
+      data: {
+        assignmentName: null,
+        totalPts: 0,
+        rules: [],
+        //GUI state variables
+        students: [],
+        selectedStudent: null,
+        selectedRules: [],
+        deletedRules: [],
+        addNum: 0,
+        addDesc: null,
+        plusFormActive: false,
+        editTitle: false,
+        editTotalPoints: false,
+        deletedComments: [],//don't save/load me. I'm ephemeral
+        activeCommentEdit: null,
+        activeCommentEditText: null,
+        commentsObj: {
+          comments: [],
+          newComment: "",
+          deleted: {}
+        }
+      },
+      filters: {
+        positive: function(num) {
+          if (num > 0) return `+${num}`;
+          return num;
+        }
+      },
+      computed: {
+        actualPts: function() { //add up all selected pts and subtract from totalPts
+          return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+        },
+        pointsSuccess: function(){
+            return this.actualPts >= this.totalPts;
+        }
+      },
+      methods: {
+        removeRule: function(i) {
+            this.deletedRules.push(this.rules.splice(i,1)[0]);
+        },
+        restoreRule: function() {
+            if (this.deletedRules.length > 0) this.rules.push(this.deletedRules.pop());
+        },
+        addRule: function(){
+          if (this.addNum === 0 || this.addDesc === "") return;
+          this.rules.push({ pts: Number(this.addNum), desc: this.addDesc, editing: false});
+          this.addNum = null;
+          this.addDesc = null;
+          this.plusFormActive = false;
+        },
+        toggleRuleEdit: function(rule) {
+          if (rule.pts && rule.desc) rule.editing = !rule.editing
+        },
+        saveLab: function(){
+            axios.post('http://localhost:3000/assignments', {//TODO json-server won't upsert information with PUT, it only inserts.
+                    id: this.assignmentName,
+                    totalPts: this.totalPts,
+                    rules: this.rules
+            })
+            .then(function (res) {
+                console.log(res);
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+        },
+        saveGrading: function(){
+            if (this.selectedStudent === null) return;
+            axios.post(`http://localhost:3000/grading`, { //TODO json-server won't upsert information with PUT, it only inserts.
+                id: `${this.assignmentName}-${this.selectedStudent}`,
+                assignmentName: this.assignmentName,
+                UVID: this.selectedStudent,
+                totalPts: this.totalPts,
+                actualPts: this.actualPts,
+                selectedRules: this.selectedRules
+            })
+            .then(function (res) {
+                console.log(res);
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+        },
+        addComment: function() {
+          if (this.commentsObj.newComment == "") return;
+          this.commentsObj.comments.push({comment: this.commentsObj.newComment, date: new Date()});
+          this.commentsObj.newComment = "";
+        },
+        removeComment: function(i) {
+          this.deletedComments.push(this.commentsObj.comments[i]);
+          this.commentsObj.comments.splice(i, 1);
+        },
+        restoreComment: function() {
+          this.commentsObj.comments.push(this.deletedComments.pop());
+        },
+        editComment: function(i) {
+          this.activeCommentEdit = i;
+          this.activeCommentEditText = this.commentsObj.comments[i].comment;
+        },
+        submitEditedComment: function(i) {
+          this.commentsObj.comments[i].comment = this.activeCommentEditText;
+          this.activeCommentEditText = null;
+          this.activeCommentEdit = null;
+        }
+      },
+      created: function(){
+        let self = this;    //closure - captures the scope of all the variables of 'this' which is the 'created' function.
 
-      //   let sum = this.totalPts;
-      //   for (rule of this.selectedRules) {
-      //       sum += rule.pts;
-      //   }
-      //   return sum;
-    }
-  },
-  methods: {
-    removeRule: function(i) {
-      this.rules.splice(i,1);
-    },
-    addRule: function() {
-      if (!this.addNum)  return;
-      if (!this.addDesc) return;
-      this.rules.push({ pts: this.addNum, desc: this.addDesc });
-      this.addNum = null;
-      this.addDesc = null;
-    }
-  }
-})
+        //Grab Lab1 info
+        axios.get('http://localhost:3000/assignments/Lab1') //TODO dynamically fetch data based on the lab id (Lab1)
+        .then(function(res){
+            self.assignmentName = res.data.id;
+            self.totalPts = res.data.totalPts;
+            self.rules = res.data.rules;
+            self.comment = res.data.commentsObj;
+        })
+        .catch(function(err){
+            console.log(err);
+        });
 
-//CLASS MILESTONE
-//TODO lazy modifier
-//TODO load
-//REFACTOR clean up add
-// - pop up the add line
-// - make the text boxes prettier
-// - get a nicer PLUS
-// - make the plus green
-//REFACTOR the two output sections into one
-//FIXME if rule is checked, and then deleted, it's still listed in summary
+        //Grab students for grading
+        axios.get('http://localhost:3000/students')
+        .then(function(res){
+            self.students = res.data;
+        })
+        .catch(function(err){
+            console.log(err);
+        });
+      }
+    });
 
-
-//TEAM MILESTONE
-//TODO save (storing the json) via axios
-//TODO recover/restore deleted rule in memory stack
-//TODO edit rule
-//TODO edit name
-//TODO edit totalPts
-//TODO list of comments (no points up or down)
-//TODO edit list of comments (no points up or down)
-//TODO delete list of comments/recovering
-//TODO create a new assignment
-travis, tanner, bob
-joel, jeremy, cameron
-jessie, harry, andrew
-paul, eric, joseph
-josh, jeff, david
-sam, parker
-
-
-
-//FUTURE
-
-
-
-
-
-
-
-
-
-//TODO load (reading the json)
-//TODO partial credit
-//TODO late penalty percentage
-//TODO tie to Canvas API
-
-</script>
+    //ITEMS TO TACKLE IN THE FUTURE
+    //TODO add a error message that fades away. (save grading with no student selected, restore rule from empty array, etc.)
+  </script>
 </body>
 
 </html>
