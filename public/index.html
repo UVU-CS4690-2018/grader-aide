@@ -308,8 +308,19 @@
       'hello-world': httpVueLoader('./components/HelloWorld.vue'),
       EditModal: httpVueLoader('./components/EditModal.vue')
     },
+<<<<<<< Updated upstream
     created: function () {}
   }); //end app = new Vue
+=======
+    created: function () {
+      //this.updateAssignment();
+      for (var i = 0; i < 15; i++) {
+        console.log('generateID: ', this.generateID());
+      }
+
+    }
+  })
+>>>>>>> Stashed changes
 
 
 
