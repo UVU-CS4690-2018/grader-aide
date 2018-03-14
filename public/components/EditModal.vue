@@ -119,7 +119,7 @@ module.exports = {
             if (this.isLastRule(ruleIndex)) this.editableRules.push({ desc: '', pts: null });
         },
         checkAddComment(commentIndex) {
-            if (this.isLastRule(ruleIndex)) this.editableRules.push({ desc: '', pts: null });
+            if (this.isLastComment(commentIndex)) this.editableComments.push({ desc: '', pts: null });
         },
         ruleCreated() {
             this.editableRules.push(this.createdRule);
