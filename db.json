@@ -1,66 +1,62 @@
 {
-<<<<<<< Updated upstream
-  "assignments": [],
-=======
-  "assignments": [
-    {
-      "id": "Lab1",
-      "totalPts": 100,
-      "rules": [
+    "assignments": [
         {
-          "id": 1,
-          "pts": -1,
-          "desc": "Test test test",
-          "checked": false
+            "id": "Lab1",
+            "totalPts": 100,
+            "rules": [
+                {
+                    "id": 1,
+                    "pts": -1,
+                    "desc": "Test test test",
+                    "checked": false
+                },
+                {
+                    "id": 2,
+                    "pts": -5,
+                    "desc": "Hello World",
+                    "checked": false
+                },
+                {
+                    "id": 3,
+                    "pts": 1,
+                    "desc": "NO SOUP FOR YOU",
+                    "checked": false
+                }
+            ]
         },
         {
-          "id": 2,
-          "pts": -5,
-          "desc": "Hello World",
-          "checked": false
-        },
-        {
-          "id": 3,
-          "pts": 1,
-          "desc": "NO SOUP FOR YOU",
-          "checked": false
+            "id": "Lab 2",
+            "totalPts": 100,
+            "rules": [
+                {
+                    "id": 1,
+                    "pts": -1,
+                    "desc": "Test test test",
+                    "checked": false
+                },
+                {
+                    "id": 2,
+                    "pts": -5,
+                    "desc": "Hello World",
+                    "checked": false
+                },
+                {
+                    "id": 3,
+                    "pts": 1,
+                    "desc": "NO SOUP FOR YOU",
+                    "checked": false
+                }
+            ]
         }
-      ]
-    },
-    {
-      "id": "Lab 2",
-      "totalPts": 100,
-      "rules": [
+    ],
+    "comments": [
         {
-          "id": 1,
-          "pts": -1,
-          "desc": "Test test test",
-          "checked": false
-        },
-        {
-          "id": 2,
-          "pts": -5,
-          "desc": "Hello World",
-          "checked": false
-        },
-        {
-          "id": 3,
-          "pts": 1,
-          "desc": "NO SOUP FOR YOU",
-          "checked": false
+            "id": 1,
+            "body": "some comment",
+            "postId": 1
         }
-      ]
+    ],
+    "profile": {
+        "name": "typicode"
     }
-  ],
-  "comments": [
-    {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
-    }
-  ],
->>>>>>> Stashed changes
-  "profile": {
-    "name": "typicode"
-  }
 }

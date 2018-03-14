@@ -35,7 +35,7 @@
 
 <body>
   <div id="app">
-    <edit-modal :modal-id="modalId" :rules="rules"></edit-modal>
+    <edit-modal :modal-id="modalId" :rules="rules" :comments="comments"></edit-modal>
 
     <div class="assignment-container main-background">
       <div class="container">
@@ -288,7 +288,7 @@
       updateAssignmentName() {
         console.log(event);
         this.assignmentEditable = false;
-        //TODO update assignment name in database
+        // TODO update assignment name in database
       },
       updateTotalPts() {
         console.log(event);
@@ -308,19 +308,8 @@
       'hello-world': httpVueLoader('./components/HelloWorld.vue'),
       EditModal: httpVueLoader('./components/EditModal.vue')
     },
-<<<<<<< Updated upstream
     created: function () {}
   }); //end app = new Vue
-=======
-    created: function () {
-      //this.updateAssignment();
-      for (var i = 0; i < 15; i++) {
-        console.log('generateID: ', this.generateID());
-      }
-
-    }
-  })
->>>>>>> Stashed changes
 
 
 

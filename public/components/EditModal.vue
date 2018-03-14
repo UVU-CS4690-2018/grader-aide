@@ -9,7 +9,7 @@
               <!-- // todo fix widths into classes -->
               <th style="width: 100px">Points</th>
               <th>Rule</th>
-              <th style="width: 100px">test</th>
+              <th style="width: 100px"></th>
           </tr>
         </thead>
 
@@ -19,38 +19,35 @@
             <td>
               <input type="text" v-model="rule.desc" @blur="handleRuleEdited(rule)" @keyup="checkAddRule(index)">
             </td>
-            <td><i class="material-icons">delete</i></td>
+            <td @click="deleteItem(rule, index)" ><i v-if="!isLastRule(index)" class="material-icons">delete</i></td>
           </tr>
-          <!-- <tr> // fixme 
-            <td><input type="text" placeholder="point value" v-model="createdRule.pts"></td>
-            <td><input type="text" placeholder="rule name" v-model="createdRule.desc" @keyup="ruleCreated()"></td>
-          </tr> -->
         </tbody>
       </table>
 
       <!-- editing comments -->
-      <!-- <h4>Edit Comments</h4>
+      <h4>Edit Comment</h4>
       <table>
         <thead>
           <tr>
-              <th>Points</th>
-              <th>Rule</th>
+              <!-- // todo fix widths into classes -->
+              <th>Description</th>
+              <th style="width: 100px"></th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="comment of editableComments" :key="comment.id">
-            <td><input type="number" v-model="rule.pts" @blur="cleanRuleAfterEdit(rule)"></td>
-            <td><input type="text" v-model="rule.desc" @blur="cleanRuleAfterEdit(rule)"></td>
-          </tr>
-          <tr>
-            <td><input type="text" placeholder="point value"></td>
-            <td><input type="text" placeholder="rule name"></td>
+          <tr v-for="(comment, index) of editableComments" :key="comment.id">
+            <td>
+              <input type="text" v-model="comment.desc" @blur="handleCommentEdited(comment)" @keyup="checkAddComment(index)">
+            </td>
+            <td @click="deleteItem(comment, index)" ><i v-if="!isLastComment(index)" class="material-icons">delete</i></td>
           </tr>
         </tbody>
-      </table> -->
+      </table>
+
     </div>
     <div class="modal-footer">
+      <a @click="undoDelete()" class="modal-action waves-effect waves-green btn-flat">Undo</a>
       <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Confirm</a>
     </div>
   </div>
@@ -60,43 +57,82 @@
 module.exports = {
     props: {
         modalId: { type: String, required: true },
-        rules: { type: Array, required: true }
-        // coments: { type: Array, required: true },
+        rules: { type: Array, required: true },
+        comments: { type: Array, required: true }
     },
     data() {
-      return {
-        editableRules: [],
-        editableComments: [],
-      }
+        return {
+            editableRules: [],
+            editableComments: [],
+            deleteStack: []
+        };
     },
     methods: {
-      deepCopy(arr) {
-        return JSON.parse(JSON.stringify(arr))
-      },
-      // mutates rule in place
-      handleRuleEdited(rule) {
-        // clean pts
-        // todo pts validation is not done yet but in progress
-        // const invalidNumVal = /(?!(^-))\D+/g
-        // const cleanPts = rule.pts.replace(invalidNumVal, '')
-        // console.log(cleanPts)
-        // rule.pts = parseInt(cleanPts)
-        
-        // clean rule
-        rule.desc = rule.desc.trim().replace(/\s+/g, ' ')
-      },
-      checkAddRule(ruleIndex) {
-        if(this.editableRules.length - 1 === ruleIndex) this.editableRules.push({ desc: '', pts: null })
-      },
-      ruleCreated() {
-        this.editableRules.push(this.createdRule)
+        deepCopy(arr) {
+            return JSON.parse(JSON.stringify(arr));
+        },
+        isLastRule(index) {
+            return index == this.editableRules.length - 1;
+        },
+        isLastComment(index) {
+            return index == this.editableComments.length - 1;
+        },
+        deleteItem(item, index) {
+            this.deleteStack.push({ item, index });
+            console.log('removed item: ', item.desc);
+            const isItemToBeRemoved = function(candidateItem) {
+                return item.id !== candidateItem.id;
+            };
 
-        this.createdRule = { desc: '', pts: null }
-      }
+            this.editableRules = this.editableRules.filter(isItemToBeRemoved);
+            this.editableComments = this.editableComments.filter(isItemToBeRemoved);
+
+            // var $toastContent = $('<span>I am toast content</span>').add(
+            //     $('<button @click="undoDelete()" class="btn-flat toast-action">Undo</button>')
+            // );
+            // Materialize.toast($toastContent, 10000);
+            //todo make this a toast
+        },
+        undoDelete() {
+            let { item, index } = this.deleteStack.pop();
+            if (item.pts) {
+                //item is a rule
+                this.editableRules.splice(index, 0, item);
+            } else {
+                //item is a comment
+                this.editableComments.splice(index, 0, item);
+            }
+        },
+        // mutates rule in place
+        handleRuleEdited(rule) {
+            rule.pts = parseInt(cleanPts);
+            console.log('rule.pts: ', rule.pts);
+
+            // clean rule
+            rule.desc = rule.desc.trim().replace(/\s+/g, ' ');
+        },
+        handleCommentEdited(comment) {
+            comment.desc = comment.desc.trim().replace(/\s+/g, ' ');
+        },
+
+        checkAddRule(ruleIndex) {
+            if (this.isLastRule(ruleIndex)) this.editableRules.push({ desc: '', pts: null });
+        },
+        checkAddComment(commentIndex) {
+            if (this.isLastRule(ruleIndex)) this.editableRules.push({ desc: '', pts: null });
+        },
+        ruleCreated() {
+            this.editableRules.push(this.createdRule);
+
+            this.createdRule = { desc: '', pts: null, id: generateID() };
+        }
     },
     created() {
-      this.editableRules = this.deepCopy(this.rules)
-      this.editableRules.push({ desc: '', pts: null })
+        this.editableRules = this.deepCopy(this.rules);
+        this.editableRules.push({ desc: '', pts: null, id: generateID() });
+
+        this.editableComments = this.deepCopy(this.comments);
+        this.editableComments.push({ desc: '', id: generateID() });
     }
 };
 </script>
