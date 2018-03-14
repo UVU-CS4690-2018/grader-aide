@@ -129,14 +129,34 @@
                     </div>
                     <!-- rules rows -->
                     <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
-                        <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-                        {{rule.pts | positive}} {{rule.desc}}
-                        <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')"
-                             title="Edit">
-                        <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)"
-                             title="Remove">
-                        <br>
-                        </input>
+                        <div v-if="ruleIndToEdit == i">
+                            <input type="text" class="col-xl-2" :value="rule.pts" v-model.number.lazy="rule.pts"
+                                   @keyup.enter="saveRuleEdit(rule)" title="pts (positive or negative)"/>
+                            <input type="text" class="col-xl-9" :value="rule.desc" v-model.trim.lazy="rule.desc"
+                                   @keyup.enter="saveRuleEdit(rule)" title="pts (positive or negative)"/>
+                            <img src="img/plusGreen.svg" class="clickable float-right" @click="saveRuleEdit(rule)" title="Save"><br>
+                        </div>
+                        <div v-if="ruleIndToEdit != i">
+                            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
+                            {{rule.pts | positive}} {{rule.desc}}
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="ruleIndToEdit = i"
+                                 title="Edit">
+                            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)"
+                                 title="Remove">
+                            <br>
+                            </input>
+                        </div>
+                        <!--<input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">-->
+                        <!--{{rule.pts | positive}} {{rule.desc}}-->
+                        <!--<img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')"-->
+                             <!--title="Edit">-->
+                        <!--<img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)"-->
+                             <!--title="Remove">-->
+                        <!--<br>-->
+                        <!--</input>-->
+
+
+
                     </div>
                     <!-- add row -->
                     <div v-if="plusFormActive">
@@ -165,24 +185,35 @@
                              @click="addCommentActive=true"><img src="img/plusGreen.svg" class="clickable"
                                                                title="Open Add Fields">
                         </div>
-
-                        <!--<div class="col-sm-1"-->
-                             <!--v-if="removedRulesStack.length > 0 && currentAssignment != 'Select Assignment'"-->
-                             <!--@click="undoRemove()"><img src="img/undoBlack.svg" class="clickable"-->
-                                                        <!--title="Undo">-->
-                        <!--</div>-->
+                        <div class="col-sm-1"
+                             v-if="removeCommentStack.length > 0"
+                             @click="undoRemoveComment()"><img src="img/undoBlack.svg" class="clickable"
+                                                        title="Undo">
+                        </div>
                     </div>
 
                     <!-- comment rows -->
                     <div v-for="(comment, i) of comments" :key="comment.id"><!-- TODO -->
-                        <input type="checkbox" name="rubric" :value="comment.body" v-model="selectedComments">
-                        {{comment.body}}
-                        <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')"
-                             title="Edit">
-                        <img src="img/xRed.svg" class="clickable float-right removeButton" @click="alert(i)"
-                             title="Remove">
-                        <br>
-                        </input>
+                        <div v-if="commIndToEdit != i" >
+                            <input type="checkbox" name="rubric" :value="comment.body" v-model="selectedComments">
+                            {{comment.body}}
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="commIndToEdit = i"
+                                 title="Edit">
+                            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeComment(i)"
+                                 title="Remove">
+                            <br>
+                            </input>
+                        </div>
+                        <div v-if="commIndToEdit == i" >
+                            <input v-if="commIndToEdit != -1" type="text" class="col-xl-9" name="rubric" :value="comment.body"
+                                   v-model="comment.body" @keyup.enter="commIndToEdit = -1">
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="commIndToEdit = -1"
+                                 title="Save Edit">
+                            <br>
+                            </input>
+                        </div>
+
+
 
 
                     </div>
@@ -196,7 +227,8 @@
             </div>
         </div>
     </div>
-    <pre>selectedComments is {{selectedComments}}</pre>
+    <pre>selectedComments is {{selectedComments}}</pre><br>
+    <pre>index to edit is {{0 == commIndToEdit}}</pre>
 </div>
 
 <!--template for the basic modal-->
@@ -325,6 +357,8 @@
             addCommentActive: false,
             currentAssignment: "Select Assignment",
             createNew: false,
+            commIndToEdit: -1,
+            ruleIndToEdit: -1,
             assignment: {
                 id: null,
                 points: 0,
@@ -337,6 +371,7 @@
             srtRulesAmount: 0,
             endRulesAmount: 0,
             removedRulesStack: [],
+            removeCommentStack: [],
             modalTitle: "New Assignment"
         },
         components: {
@@ -360,6 +395,19 @@
             }
         },
         methods: {
+            undoRemoveComment: function () {
+                let i = this.removeCommentStack.pop();
+                console.log(i.idx, i.val);
+                this.comments.splice(i.idx, 0, i.val);
+            },
+            removeComment: function (i) {
+                let obj = {
+                    'idx': i,
+                    'val': this.comments[i]
+                };
+                this.removeCommentStack.push(obj);
+                this.comments.splice(i, 1);
+            },
             removeRule: function (i) {
                 let obj = {
                     'idx': i,
@@ -368,6 +416,12 @@
                 this.removedRulesStack.push(obj);
                 this.rules.splice(i, 1);
                 this.endRulesAmount--;
+            },
+            saveRuleEdit: function (rule) {
+                console.log("save an edit");
+                if (!rule.pts) return;
+                if (!rule.desc) return;
+                this.ruleIndToEdit = -1;
             },
             addRule: function () {
                 if (!this.addNum) return;
