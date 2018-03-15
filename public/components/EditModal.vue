@@ -72,7 +72,12 @@
       >
         Undo
       </a>
-      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat green-text">Save Changes</a>
+      <a 
+        href="#" class="modal-action modal-close waves-effect waves-green btn-flat green-text"
+        @click="handleSaveEdits"
+      >
+        Save Changes
+      </a>
     </div>
   </div>
 </template>
@@ -130,6 +135,14 @@ module.exports = {
 
       this.editableComments = this.deepCopy(this.comments)
       this.editableComments.push({ desc: '', id: generateID() })
+    },
+    handleSaveEdits() {
+      const rules = this.deepCopy(this.editableRules)
+      rules.pop()
+      const comments = this.deepCopy(this.editableComments)
+      comments.pop()
+
+      this.$emit('save-edits', { rules, comments })
     },
 
     // ==================================================

@@ -35,7 +35,7 @@
 
 <body>
   <div id="app">
-    <edit-modal :modal-id="modalId" :rules="rules" :comments="comments"></edit-modal>
+    <edit-modal :modal-id="modalId" :rules="rules" :comments="comments" @save-edits="handleSaveEdits"></edit-modal>
 
     <div class="assignment-container main-background">
       <div class="container">
@@ -203,6 +203,11 @@
       }
     },
     methods: {
+      handleSaveEdits({ rules, comments }) {
+        // fixme see https://github.com/Jcroxford/grader-aide/issues/1
+        this.rules = rules
+        this.comments = comments
+      },
       handleRuleOrCommentStatusChange(item) {
         item.checked = !item.checked;
       },
@@ -305,7 +310,6 @@
       }
     },
     components: {
-      'hello-world': httpVueLoader('./components/HelloWorld.vue'),
       EditModal: httpVueLoader('./components/EditModal.vue')
     },
     created: function () {}
