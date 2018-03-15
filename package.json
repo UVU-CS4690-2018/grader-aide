@@ -4,7 +4,7 @@
   "description": "static vue app for grading an assignment with ease!",
   "main": "index.js",
   "scripts": {
-    "start": "json-server --watch db.json",
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,9 +18,15 @@
   },
   "homepage": "https://github.com/UVU-CS4690-2018/grader-aide#readme",
   "devDependencies": {
-    "json-server": "^0.12.1"
+    "json-server": "^0.12.1",
+    "nodemon": "^1.17.2"
   },
   "dependencies": {
-    "clipboard": "^2.0.0"
+    "clipboard": "^2.0.0",
+    "express": "^4.16.3",
+    "helmet": "^3.12.0",
+    "mongodb": "^3.0.4",
+    "morgan": "^1.9.0",
+    "serve-favicon": "^2.4.5"
   }
 }
