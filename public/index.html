@@ -54,6 +54,18 @@
         }
 
         /*End of modal*/
+
+        .nav-custom > a{
+            color: black;
+            padding-bottom: 20px;
+        }
+        .nav-custom > a:hover{
+            border-bottom: 5px solid darkgreen;
+            padding-bottom: 15px;
+        }
+        .cus-hr {
+            margin-top: -.5rem;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script><!-- TODO -->
@@ -84,38 +96,41 @@
                                 </select>
 
                             </ul>
-                            <ul class="nav navbar-nav">
-                                <button class="btn btn-light btn-sm"
-                                        v-if="currentAssignment != 'Select Assignment'"
-                                        @click="editAssignment()">
-                                    Edit
-                                </button>
-                                <button class="btn btn-light btn-sm"
-                                        v-if="!createNew"
-                                        @click="newAssignment()">
-                                    Create
-                                </button>
-                            </ul>
                             <ul class="nav navbar-nav navbar-right">
                                 <p class="navbar-text"><b>Points {{totalPts}}</b></p>
                             </ul>
                         </div>
                     </nav>
-                    <form class="form-inline" v-if="createNew">
-                        <div class="form-group ml-4 mb-2">
-                            <label for="addAssignment" class="sr-only">Name</label>
-                            <input type="text" class="form-control" id="addAssignment" placeholder="Name"
-                                   v-model.trim.lazy="addAssignment">
+                    <!--navbar for create save and edit assignments-->
+                    <nav class="navbar navbar-default">
+                        <div class="container">
+                            <ul class="navbar-nav mx-auto">
+                                <li class="nav-item nav-custom">
+                                    <a class="nav-link" href="#" @click="newAssignment()" title="Create Assignment">Create</a>
+                                </li>
+                            </ul>
+                            <ul class="navbar-nav mx-auto">
+                                <li class="nav-item nav-custom">
+                                    <a class="nav-link" href="#" v-if="currentAssignment != 'Select Assignment'"
+                                       @click="saveState()" title="Save Assignment">Save</a>
+                                </li>
+
+                            </ul>
+                            <ul class="navbar-nav mx-auto">
+                                <li class="nav-item nav-custom">
+                                    <a class="nav-link" href="#" v-if="currentAssignment != 'Select Assignment'"
+                                       @click="editAssignment()" title="Edit Assignment">Edit</a>
+                                </li>
+                            </ul>
                         </div>
-                        <button type="button" class="btn btn-light mb-2" @click="createNewAssignment()">Add</button>
-                    </form>
-                    <hr/>
-                    <button class="btn btn-light btn-sm"
-                            v-if="srtRulesAmount != endRulesAmount"
-                            @click="saveState()">
-                        Save
-                    </button>
+                    </nav>
+
+                    <!--rules section-->
+                    <hr class="cus-hr"/>
                     <div class="row">
+                        <div class="col-sm-4">
+                            <h5>Rules</h5>
+                        </div>
                         <div class="col-sm-1" v-if="!plusFormActive && currentAssignment != 'Select Assignment'"
                              @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable"
                                                                title="Open Add Fields">
@@ -127,6 +142,7 @@
                                                         title="Undo">
                         </div>
                     </div>
+<<<<<<< HEAD
                     <!-- list/edit rules row -->
                     <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
                         <div v-if="ruleIndToEdit == i">
@@ -135,6 +151,17 @@
                             <input type="text" class="col-xl-9" :value="rule.desc" v-model.trim.lazy="rule.desc"
                                    @keyup.enter="saveRuleEdit(rule)"/><!---->
                             <img src="img/plusGreen.svg" class="clickable float-right" @click="saveRuleEdit(rule)" title="Save"><br>
+=======
+                    <!-- rules rows -->
+                    <div v-for="(rule, i) of rules" :key="i"><!-- TODO -->
+                        <div v-if="ruleIndToEdit == i">
+                            <input type="text" class="col-sm-2" :value="rule.pts" v-model.number.lazy="rule.pts"
+                                   @keyup.enter="saveRuleEdit(rule)" title="pts (positive or negative)">
+                            <input type="text" class="col-sm-9" :value="rule.desc" v-model.trim.lazy="rule.desc"
+                                   @keyup.enter="saveRuleEdit(rule)">
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="saveRuleEdit(rule)"
+                                 title="Save"><br>
+>>>>>>> f35567f9504c63276c0e2c3832200f9fc5a00a98
                         </div>
                         <div v-if="ruleIndToEdit != i">
                             <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
@@ -146,55 +173,55 @@
                             <br>
                             </input>
                         </div>
-                        <!--<input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">-->
-                        <!--{{rule.pts | positive}} {{rule.desc}}-->
-                        <!--<img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')"-->
-                             <!--title="Edit">-->
-                        <!--<img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)"-->
-                             <!--title="Remove">-->
-                        <!--<br>-->
-                        <!--</input>-->
-
-
-
                     </div>
+<<<<<<< HEAD
                     <!-- add rules row -->
+=======
+
+                    <!-- add row -->
+>>>>>>> f35567f9504c63276c0e2c3832200f9fc5a00a98
                     <div v-if="plusFormActive">
-                        <input type="text" class="col-xl-2" v-model.number.lazy="addNum" @keyup.enter="addRule()"
+                        <input type="text" class="col-sm-2" v-model.number.lazy="addNum" @keyup.enter="addRule()"
                                title="pts (positive or negative)">
-                        <input type="text" class="col-xl-9" v-model.trim.lazy="addDesc" @keyup.enter="addRule()"
+                        <input type="text" class="col-sm-9" v-model.trim.lazy="addDesc" @keyup.enter="addRule()"
                                placeholder="Type your new rule here ...">
                         <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
                     </div>
 
                     <!-- output rows -->
-                    <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
+                    <div v-if="actualPts < totalPts" class="alert alert-warning mt-3" role="alert">
                         <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+                        <span v-for="selectedComment of selectedComments">- {{selectedComment}}<br></span>
                         <hr>
                         {{actualPts}}
+
                     </div>
-                    <div v-else class="alert alert-success" role="alert">
+                    <div v-else class="alert alert-success mt-3" role="alert">
                         <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-                        <b>Good Job</b>
+                        <b>Good Job</b><br>
+                        <span v-for="selectedComment of selectedComments">- {{selectedComment}}<br></span>
                         <hr>
                         {{actualPts}}
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-1" v-if="!addCommentActive"
+                        <div class="col-sm-4">
+                            <h5>Comments</h5>
+                        </div>
+                        <div class="col-sm-1 float-right" v-if="!addCommentActive"
                              @click="addCommentActive=true"><img src="img/plusGreen.svg" class="clickable"
-                                                               title="Open Add Fields">
+                                                                 title="Open Add Fields">
                         </div>
                         <div class="col-sm-1"
                              v-if="removeCommentStack.length > 0"
                              @click="undoRemoveComment()"><img src="img/undoBlack.svg" class="clickable"
-                                                        title="Undo">
+                                                               title="Undo">
                         </div>
                     </div>
 
                     <!-- comment rows -->
                     <div v-for="(comment, i) of comments" :key="comment.id"><!-- TODO -->
-                        <div v-if="commIndToEdit != i" >
+                        <div v-if="commIndToEdit != i">
                             <input type="checkbox" name="rubric" :value="comment.body" v-model="selectedComments">
                             {{comment.body}}
                             <img src="img/pencilBlack.svg" class="clickable float-right" @click="commIndToEdit = i"
@@ -204,8 +231,9 @@
                             <br>
                             </input>
                         </div>
-                        <div v-if="commIndToEdit == i" >
-                            <input v-if="commIndToEdit != -1" type="text" class="col-xl-9" name="rubric" :value="comment.body"
+                        <div v-if="commIndToEdit == i">
+                            <input v-if="commIndToEdit != -1" type="text" class="col-sm-9" name="rubric"
+                                   :value="comment.body"
                                    v-model="comment.body" @keyup.enter="commIndToEdit = -1">
                             <img src="img/pencilBlack.svg" class="clickable float-right" @click="commIndToEdit = -1"
                                  title="Save Edit">
@@ -214,21 +242,21 @@
                         </div>
 
 
-
-
                     </div>
                     <!-- add comment -->
                     <div v-if="addCommentActive">
-                        <input type="text" class="col-xl-9" v-model.trim.lazy="addCommentBody" @keyup.enter="addComment()"
+                        <input type="text" class="col-sm-9" v-model.trim.lazy="addCommentBody"
+                               @keyup.enter="addComment()"
                                placeholder="Type your new comment here ...">
-                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addComment()" title="Add"><br>
+                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addComment()"
+                             title="Add"><br>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <pre>selectedComments is {{selectedComments}}</pre><br>
-    <pre>index to edit is {{0 == commIndToEdit}}</pre>
+    <!--<pre>selectedComments is {{selectedComments}}</pre>-->
+    <br>
 </div>
 
 <!--template for the basic modal-->
@@ -303,7 +331,7 @@
         template: '#modal',
     });
 
-    // Modal Comment Component
+    // Modal Comment Component for editing and creating new assignments
     const ModalComment = Vue.extend({
         props: ['config', 'assignment', 'title'],
         components: {
@@ -514,7 +542,7 @@
                     'profile': this.profile
 
                 };
-                axios.patch('db.json', obj).then(function (response) {
+                axios.put('db.json', obj).then(function (response) {
                     console.log(response);
                 }).catch(function (error) {
                     console.log(error);
@@ -522,7 +550,7 @@
             },
             addComment: function () {
                 if (!this.addCommentBody) return;
-                const nextId = this.comments[this.comments.length-1].id++;
+                const nextId = this.comments[this.comments.length - 1].id++;
                 //add comment to array with id
                 this.comments.push({'id': nextId, 'body': this.addCommentBody, 'postId': nextId});
                 this.addCommentBody = null;
@@ -559,7 +587,7 @@
     //TEAM MILESTONE
     //TODO save (storing the json) via axios - need to talk with Prof. about why not working
     //TODO recover/restore deleted rule in memory stack --DONE
-    //TODO edit rule
+    //TODO edit rule --DONE
     //TODO edit name --DONE
     //TODO edit totalPts --DONE
     //TODO list of comments (no points up or down) DONE
