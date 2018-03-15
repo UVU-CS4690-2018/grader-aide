@@ -28,68 +28,77 @@
     </nav>
 
 
-    <div class="container" id="app">
-        <div class="row" style="margin-top: 15px; color: #9e9e9e;">
+    <div class="container-fluid" id="app">
+        <div class="row" style="color: #9e9e9e;">
             <div class="col align-self-center text-center collapse" id="collapseExample">To undo delete: <span style="color: orange;">Ctrl+Z</span></div>
         </div>
         <div class="row">
             <!-- title row -->
-
-            <div class="col-xl-6 offset-xl-3 margMain">
-                <div class="container">
-                    <div class="row">
-                        <h2 v-if="!editName" class="assignmentName" @click="editName = !editName;">{{name}}</h2>
-                        <input style="width: 50%" v-else class="editName textInput" type="text" v-model="name">
-                        <span v-if="editName" style="padding: 15px;" class="clickable" @click="editName = !editName;">💾</span>
-                        <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editName = !editName;" class="clickable">
+            <div class="col-xs-12 col-sm-3 assignmentListContainer">
+                <h4 class="assignmentHdr">Assignments</h4>
+                <div class="list-group assignmentList">
+                    <a class="list-group-item clickable" style="color: black;" @click="switchAssignment(i)" v-for="(assignment, i) in assignments">
+                        {{assignment.name}}
+                    </a>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 margMain">
+                <div style="margin: auto; width: 75%;">
+                    <div class="container">
+                        <div class="row">
+                            <h2 v-if="!editName" class="assignmentName" @click="editName = !editName;">{{name}}</h2>
+                            <input style="width: 50%" v-else class="editName textInput" type="text" v-model="name">
+                            <span v-if="editName" style="padding: 15px;" class="clickable" @click="editName = !editName; currentAssignment.name = name">💾</span>
+                            <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editName = !editName;" class="clickable">
+                        </div>
                     </div>
-                </div>
-                <hr class="line">
-                <div class="container">
-                    <div class="row">
-                        <h4 v-if="!editTotalPts" @click="editTotalPts = !editTotalPts;">{{totalPts}}<span class="ptsPts"> pts</span></h4>
-                        <input v-else style="width: 20%" class="editTotalPts textInput" type="number" v-model.number="totalPts">
-                        <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts;">💾</span>
-                        <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editTotalPts = !editTotalPts;" class="clickable">
+                    <hr class="line">
+                    <div class="container">
+                        <div class="row">
+                            <h4 v-if="!editTotalPts" @click="editTotalPts = !editTotalPts;">{{totalPts}}<span class="ptsPts"> pts</span></h4>
+                            <input v-else style="width: 20%" class="editTotalPts textInput" type="number" v-model.number="totalPts">
+                            <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts;">💾</span>
+                            <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editTotalPts = !editTotalPts;" class="clickable">
+                        </div>
                     </div>
-                </div>
 
-                <div v-if="!plusFormActive" @click="plusFormActive=true">
-                    <img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"><span style="padding: 15px">Add Rules / Comments</span>
-                </div>
+                    <div v-if="!plusFormActive" @click="plusFormActive=true">
+                        <img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"><span style="padding: 15px">Add Rules / Comments</span>
+                    </div>
 
 
-                <!-- rules rows -->
-                <div v-for="(rule, i) of rules" :key="rule.desc" class="container ruleRow">
-                    <rule v-model="selectedRules" v-bind:rule="rule" v-bind:index="i" v-on:rulechecked="checkrule" v-on:ruleunchecked="uncheckrule" v-on:deleterule="deleteRule" v-on:rulechanged="ruleChanged"></rule>
-                </div>
+                    <!-- rules rows -->
+                    <div v-for="(rule, i) of rules" :key="rule.desc" class="container ruleRow">
+                        <rule v-model="selectedRules" v-bind:rule="rule" v-bind:index="i" v-on:rulechecked="checkrule" v-on:ruleunchecked="uncheckrule" v-on:deleterule="deleteRule" v-on:rulechanged="ruleChanged"></rule>
+                    </div>
 
-                <!-- add row -->
-                <div v-if="plusFormActive">
-                    <input class="addRuleNum col-xl-2" type="number" v-model.number.lazy="addNum" @keyup.enter="addRule()" title="pts (positive or negative)">
-                    <input class="addRuleDesc col-xl-9" type="text" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
-                    <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
-                </div>
+                    <!-- add row -->
+                    <div v-if="plusFormActive">
+                        <input class="addRuleNum col-xl-2" type="number" v-model.number.lazy="addNum" @keyup.enter="addRule()" title="pts (positive or negative)">
+                        <input class="addRuleDesc col-xl-9" type="text" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
+                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
+                    </div>
 
-                <!-- output rows -->
-                <div v-if="actualPts < totalPts" class="alert alert-warning margMain" role="alert">
-                    <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-                    <hr> {{actualPts}}
-                </div>
-                <div v-else class="alert alert-success margMain" role="alert">
-                    <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-                    <b>Good Job</b>
-                    <hr> {{actualPts}}
-                </div>
-                <button @click="saveChanges()" class="btn btn-success">
-                    Save
+                    <!-- output rows -->
+                    <div v-if="actualPts < totalPts" class="alert alert-warning margMain" role="alert">
+                        <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+                        <hr> {{actualPts}}
+                    </div>
+                    <div v-else class="alert alert-success margMain" role="alert">
+                        <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+                        <b>Good Job</b>
+                        <hr> {{actualPts}}
+                    </div>
+                    <button @click="saveChanges()" class="btn btn-success">
+                        Save
+                    </button>
+                    <button @click="createNewAssignment()" class="btn btn-primary">
+                        Create Assignment
                 </button>
-                <button @click="createNewAssignment()" class="btn btn-primary">
-                    Create Assignment
-                <!--</button>-->
                 <!--<button @click="loadAssignment()" class="btn btn-primary">-->
                     <!--Load Assignment-->
                 <!--</button>-->
+                </div>
             </div>
         </div>
     </div>
@@ -202,6 +211,8 @@
                 rules: [],
                 //temporary gui state
                 selectedRules: [],
+                currentAssignment: null,
+                assignments: [],
                 addNum: null,
                 addDesc: null,
                 deletedRuleStack: [],
@@ -257,10 +268,25 @@
                     alert('saving changes');
                 },
                 createNewAssignment: function() {
-                    alert('creating new assignment');
+                    this.rules = [];
+                    this.name = 'New';
+                    this.totalPts = 100;
+                    this.plusFormActive = false;
+                    let newAssignment = {
+                      name: this.name,
+                      rules: this.rules,
+                      totalPts: this.totalPts
+                    };
+                    this.assignments.push(newAssignment);
+                    this.currentAssignment = this.assignments[this.assignments.length - 1];
                 },
-                loadAssignment: function() {
-                    alert('loading saved assignment')
+                switchAssignment: function(index) {
+                    let newAssignment = this.assignments[index];
+                    this.name = newAssignment.name;
+                    this.rules = newAssignment.rules;
+                    this.totalPts = newAssignment.totalPts;
+                    this.plusFormActive = false;
+                    this.currentAssignment = this.assignments[index];
                 }
             },
             created: function() {
@@ -281,6 +307,8 @@
                         self.name = response.data.name;
                         self.totalPts = response.data.totalPts;
                         self.rules = response.data.rules;
+                        self.assignments.push(response.data);
+                        self.currentAssignment = self.assignments[0];
                     })
                     .catch(function(error) {
                         console.log(error);

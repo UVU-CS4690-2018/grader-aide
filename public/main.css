@@ -337,7 +337,7 @@ label {
 
 .assignmentHdr {
     margin-bottom: 0px;
-    padding-top: 60px;
+    padding-top: 12px;
     padding-bottom: 15px;
     color: rgb(41, 54, 63);
     padding-left: 15px;
@@ -574,4 +574,29 @@ input:checked + .slider:before {
 
 .ruleRow:nth-child(odd) {
     background-color: #31414c;
+}
+
+.assignmentList {
+    margin-left: 0px;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.assignmentList {
+    margin-left: 0px;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.assignmentListContainer {
+    height: -webkit-fill-available;
+    height: 100vh;
+    padding-left: 0px;
+    padding-right: 0px;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3), 0 10px 20px 0 rgba(5, 5, 5, 0.19);
 }
