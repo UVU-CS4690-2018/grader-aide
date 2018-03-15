@@ -225,11 +225,7 @@
                     this.deletedRuleStack.push(this.rules.splice(payload.index, 1));
                 },
                 addRule: function() {
-                    //if (!this.addNum) {
-                    //alert("No point value entered.  This rule will be added as a comment.");
-                    //}
                     //if a rule is added without points, it is accepted as a comment
-
                     if (!this.addDesc) return;
 
                     this.rules.push({
