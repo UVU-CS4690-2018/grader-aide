@@ -127,13 +127,13 @@
                                                         title="Undo">
                         </div>
                     </div>
-                    <!-- rules rows -->
+                    <!-- list/edit rules row -->
                     <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
                         <div v-if="ruleIndToEdit == i">
                             <input type="text" class="col-xl-2" :value="rule.pts" v-model.number.lazy="rule.pts"
-                                   @keyup.enter="saveRuleEdit(rule)" title="pts (positive or negative)"/>
+                                   @keyup.enter="saveRuleEdit(rule)" title="Edit Points"/><!---->
                             <input type="text" class="col-xl-9" :value="rule.desc" v-model.trim.lazy="rule.desc"
-                                   @keyup.enter="saveRuleEdit(rule)" title="pts (positive or negative)"/>
+                                   @keyup.enter="saveRuleEdit(rule)"/><!---->
                             <img src="img/plusGreen.svg" class="clickable float-right" @click="saveRuleEdit(rule)" title="Save"><br>
                         </div>
                         <div v-if="ruleIndToEdit != i">
@@ -158,7 +158,7 @@
 
 
                     </div>
-                    <!-- add row -->
+                    <!-- add rules row -->
                     <div v-if="plusFormActive">
                         <input type="text" class="col-xl-2" v-model.number.lazy="addNum" @keyup.enter="addRule()"
                                title="pts (positive or negative)">
