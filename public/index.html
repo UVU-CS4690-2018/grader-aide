@@ -87,6 +87,9 @@
                 <button @click="createNewAssignment()" class="btn btn-primary">
                     Create Assignment
                 </button>
+                <button @click="loadAssignment()" class="btn btn-primary">
+                    Load Assignment
+                </button>
             </div>
         </div>
     </div>
@@ -259,6 +262,9 @@
                 },
                 createNewAssignment: function() {
                     alert('creating new assignment');
+                },
+                loadAssignment: function() {
+                    alert('loading saved assignment')
                 }
             },
             created: function() {
