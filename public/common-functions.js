@@ -12,7 +12,7 @@ function generateID() {
 
 function getAssignments(callback) {
   axios
-    .get('/assignments')
+    .get('/api/assignment')
     .then(function(response) {
       callback(response.data);
     })

@@ -1,3 +1,5 @@
+const assignmentRouter = require('./routes/assignment.routes.js');
+
 const express = require('express');
 const logger = require('morgan');
 const helmet = require('helmet');
@@ -18,6 +20,8 @@ mongo
 app.use(logger('dev'));
 app.use(helmet());
 app.use(express.static('public'));
+
+app.use('/api', assignmentRouter);
 
 const port = process.env.PORT || 3001;
 
