@@ -17,14 +17,15 @@
 
 <body>
 
-<nav class="navbar navbar-custom navbar-fixed-top">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <a class="navbar-brand brandingNavHdr" href="#">Grader-Aide</a>
+    <nav class="navbar navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand brandingNavHdr" href="#">Grader-Aide</a>
+            </div>
         </div>
-    </div><!-- /.container-fluid -->
-</nav>
+        <!-- /.container-fluid -->
+    </nav>
 
 
     <div class="container" id="app">
@@ -35,23 +36,23 @@
             <!-- title row -->
 
             <div class="col-xl-6 offset-xl-3 margMain">
-        <div class="container">
-          <div class="row">
-            <h2 v-if="!editName" class="assignmentName" @click="editName = !editName;">{{name}}</h2>
-            <input style="width: 50%" v-else class="editName textInput" type="text" v-model="name">
-            <span v-if="editName" style="padding: 15px;" class="clickable" @click="editName = !editName;">💾</span>
-            <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editName = !editName;" class="clickable">
-          </div>
-        </div>
+                <div class="container">
+                    <div class="row">
+                        <h2 v-if="!editName" class="assignmentName" @click="editName = !editName;">{{name}}</h2>
+                        <input style="width: 50%" v-else class="editName textInput" type="text" v-model="name">
+                        <span v-if="editName" style="padding: 15px;" class="clickable" @click="editName = !editName;">💾</span>
+                        <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editName = !editName;" class="clickable">
+                    </div>
+                </div>
                 <hr class="line">
-        <div class="container">
-          <div class="row">
-            <h4 v-if="!editTotalPts" @click="editTotalPts = !editTotalPts;">{{totalPts}}<span class="ptsPts"> pts</span></h4>
-            <input v-else style="width: 20%" class="editTotalPts textInput" type="number" v-model.number="totalPts">
-            <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts;">💾</span>
-            <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editTotalPts = !editTotalPts;" class="clickable">
-          </div>
-        </div>
+                <div class="container">
+                    <div class="row">
+                        <h4 v-if="!editTotalPts" @click="editTotalPts = !editTotalPts;">{{totalPts}}<span class="ptsPts"> pts</span></h4>
+                        <input v-else style="width: 20%" class="editTotalPts textInput" type="number" v-model.number="totalPts">
+                        <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts;">💾</span>
+                        <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editTotalPts = !editTotalPts;" class="clickable">
+                    </div>
+                </div>
 
                 <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
 
@@ -88,11 +89,10 @@
         </div>
     </div>
     <script>
+        Vue.component('rule', {
 
-    Vue.component('rule', {
-
-    props: ['rule', 'index'],
-    template: `
+            props: ['rule', 'index'],
+            template: `
                 <div class="row align-items-center">
                     <label class="switch col-1">
                         <input type="checkbox" @change="check" :value="rule">
@@ -109,145 +109,177 @@
                     </div>
                 </div>
 `,
-    data: function () {
-        return {
-            id: this._uid,
-            edit: false,
-            locDesc: this.rule.desc,
-            locPts: this.rule.pts,
-            checked: false,
-            shownUndoTip: false
-        }
-    },
-    filters: {
-        positive: function(num) {
-            if (num > 0) return `+${num}`;
-            return num;
-        }
-    },
-    methods: {
-        remove: function () {
-            this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
-            this.$emit('deleterule', {index: this.index});
-            if(!this.shownUndoTip) {
-                $('.collapse').collapse();
-                this.shownUndoTip = true;
-                setTimeout(
-                    function() {
-                        $('.collapse').collapse('hide');
-                    }, 3000);
-            }
-        },
-        editvalues: function () {
-            this.edit = !this.edit;
-        },
-        savevalues: function (event) {
-            this.edit = !this.edit;
-            let oldDesc = this.rule.desc;
-            this.$emit('rulechanged', {desc: this.locDesc, pts: this.locPts, index: this.index});
-            if(oldDesc != this.rule.desc) {
-                this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
-            }
-            if (this.checked && oldDesc == this.rule.desc) {
-                this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
-                this.$emit('rulechecked', { rule: this.rule, id: this.id });
-            }
-        },
-        check: function (event) {
-            if(event.target.checked) {
-                this.$emit('rulechecked', { rule: this.rule, id: this.id });
-                this.checked = true;
-            } else {
-                this.$emit('ruleunchecked', { rule: this.rule, id: this.id });
-                this.checked = false;
-            }
-        }
-    }
-})
-
-let app = new Vue({
-    el: '#app',
-    data: { //persisted data
-        name: null,
-        totalPts: 0,
-        rules: [],
-        //temporary gui state
-        selectedRules: [],
-        addNum: null,
-        addDesc: null,
-        deletedRuleStack: [],
-        plusFormActive: false,
-        editName: false,
-        editTotalPts: false
-    },
-    filters: {
-        positive: function(num) {
-            if (num > 0) return `+${num}`;
-            return num;
-        }
-    },
-    computed: {
-        actualPts: function() { //add up all selected pts and subtract from totalPts
-            return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
-        }
-    },
-    methods: {
-    deleteRule: function(payload) {
-      this.deletedRuleStack.push(this.rules.splice(payload.index,1));
-    },
-    addRule: function() {
-        if (!this.addNum) return;
-        if (!this.addDesc) return;
-        this.rules.push({
-            pts: this.addNum,
-            desc: this.addDesc
-        });
-        this.addNum = null;
-        this.addDesc = null;
-        this.plusFormActive = false;
-    },
-    checkrule: function (payload) {
-      this.selectedRules.push({id: payload.id, pts: payload.rule.pts, desc: payload.rule.desc});
-    },
-    uncheckrule: function (payload) {
-      this.selectedRules = this.selectedRules.filter(function( obj ) {
-          return obj.id !== payload.id;
-      });
-    },
-    ruleChanged: function (payload) {
-      let rule = this.rules[payload.index];
-      rule.desc = payload.desc;
-      rule.pts = parseInt(payload.pts);
-    },
-    saveChanges: function (event) {
-      alert('saving changes');
-    },
-    createNewAssignment: function() {
-      alert('creating new assignment');
-    }
-    },
-        created: function() {
-            let self = this;
-            window.addEventListener('keydown', function(event) {
-                // If Ctrl+Z is pressed
-                console.log(event.code);
-                if (event.ctrlKey && event.keyCode == 90 && self.deletedRuleStack.length > 0) {
-                    let newRule = self.deletedRuleStack.pop();
-                    self.rules.push({pts: newRule[0].pts, desc: newRule[0].desc});
+            data: function() {
+                return {
+                    id: this._uid,
+                    edit: false,
+                    locDesc: this.rule.desc,
+                    locPts: this.rule.pts,
+                    checked: false,
+                    shownUndoTip: false
                 }
-            });
-            axios.get('lab1.json')
-                .then(function(response) {
-                    self.name = response.data.name;
-                    self.totalPts = response.data.totalPts;
-                    self.rules = response.data.rules;
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
+            },
+            filters: {
+                positive: function(num) {
+                    if (num > 0) return `+${num}`;
+                    return num;
+                }
+            },
+            methods: {
+                remove: function() {
+                    this.$emit('ruleunchecked', {
+                        rule: this.rule,
+                        id: this.id
+                    });
+                    this.$emit('deleterule', {
+                        index: this.index
+                    });
+                    if (!this.shownUndoTip) {
+                        $('.collapse').collapse();
+                        this.shownUndoTip = true;
+                        setTimeout(
+                            function() {
+                                $('.collapse').collapse('hide');
+                            }, 3000);
+                    }
+                },
+                editvalues: function() {
+                    this.edit = !this.edit;
+                },
+                savevalues: function(event) {
+                    this.edit = !this.edit;
+                    let oldDesc = this.rule.desc;
+                    this.$emit('rulechanged', {
+                        desc: this.locDesc,
+                        pts: this.locPts,
+                        index: this.index
+                    });
+                    if (oldDesc != this.rule.desc) {
+                        this.$emit('ruleunchecked', {
+                            rule: this.rule,
+                            id: this.id
+                        });
+                    }
+                    if (this.checked && oldDesc == this.rule.desc) {
+                        this.$emit('ruleunchecked', {
+                            rule: this.rule,
+                            id: this.id
+                        });
+                        this.$emit('rulechecked', {
+                            rule: this.rule,
+                            id: this.id
+                        });
+                    }
+                },
+                check: function(event) {
+                    if (event.target.checked) {
+                        this.$emit('rulechecked', {
+                            rule: this.rule,
+                            id: this.id
+                        });
+                        this.checked = true;
+                    } else {
+                        this.$emit('ruleunchecked', {
+                            rule: this.rule,
+                            id: this.id
+                        });
+                        this.checked = false;
+                    }
+                }
             }
         })
 
+        let app = new Vue({
+            el: '#app',
+            data: { //persisted data
+                name: null,
+                totalPts: 0,
+                rules: [],
+                //temporary gui state
+                selectedRules: [],
+                addNum: null,
+                addDesc: null,
+                deletedRuleStack: [],
+                plusFormActive: false,
+                editName: false,
+                editTotalPts: false
+            },
+            filters: {
+                positive: function(num) {
+                    if (num > 0) return `+${num}`;
+                    return num;
+                }
+            },
+            computed: {
+                actualPts: function() { //add up all selected pts and subtract from totalPts
+                    return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+                }
+            },
+            methods: {
+                deleteRule: function(payload) {
+                    this.deletedRuleStack.push(this.rules.splice(payload.index, 1));
+                },
+                addRule: function() {
+                    //if (!this.addNum) return;
+                    //if a rule is added without points, it is accepted as a comment
+
+                    if (!this.addDesc) return;
+                    this.rules.push({
+                        pts: this.addNum,
+                        desc: this.addDesc
+                    });
+                    this.addNum = null;
+                    this.addDesc = null;
+                    this.plusFormActive = false;
+                },
+                checkrule: function(payload) {
+                    this.selectedRules.push({
+                        id: payload.id,
+                        pts: payload.rule.pts,
+                        desc: payload.rule.desc
+                    });
+                },
+                uncheckrule: function(payload) {
+                    this.selectedRules = this.selectedRules.filter(function(obj) {
+                        return obj.id !== payload.id;
+                    });
+                },
+                ruleChanged: function(payload) {
+                    let rule = this.rules[payload.index];
+                    rule.desc = payload.desc;
+                    rule.pts = parseInt(payload.pts);
+                },
+                saveChanges: function(event) {
+                    alert('saving changes');
+                },
+                createNewAssignment: function() {
+                    alert('creating new assignment');
+                }
+            },
+            created: function() {
+                let self = this;
+                window.addEventListener('keydown', function(event) {
+                    // If Ctrl+Z is pressed
+                    console.log(event.code);
+                    if (event.ctrlKey && event.keyCode == 90 && self.deletedRuleStack.length > 0) {
+                        let newRule = self.deletedRuleStack.pop();
+                        self.rules.push({
+                            pts: newRule[0].pts,
+                            desc: newRule[0].desc
+                        });
+                    }
+                });
+                axios.get('lab1.json')
+                    .then(function(response) {
+                        self.name = response.data.name;
+                        self.totalPts = response.data.totalPts;
+                        self.rules = response.data.rules;
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            }
+        })
     </script>
 </body>
 
