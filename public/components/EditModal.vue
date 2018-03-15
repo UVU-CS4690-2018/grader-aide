@@ -131,7 +131,7 @@ module.exports = {
     },
     resetEditableArrays() {
       this.editableRules = this.deepCopy(this.rules)
-      this.editableRules.push({ desc: '', pts: null, id: generateID() })
+      this.editableRules.push({ desc: '', pts: null, checked: false, id: generateID() })
 
       this.editableComments = this.deepCopy(this.comments)
       this.editableComments.push({ desc: '', id: generateID() })
@@ -159,7 +159,7 @@ module.exports = {
       rule.desc = rule.desc.trim().replace(/\s+/g, ' ')
     },
     checkAddRule(ruleIndex) {
-      if (this.isLastRule(ruleIndex)) this.editableRules.push({ desc: '', pts: null })
+      if (this.isLastRule(ruleIndex)) this.editableRules.push({ desc: '', pts: null, checked: false })
     },
 
     // ==================================================
