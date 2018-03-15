@@ -54,7 +54,9 @@
                     </div>
                 </div>
 
-                <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
+                <div v-if="!plusFormActive" @click="plusFormActive=true">
+                    <img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"><span style="padding: 15px">Add Rules / Comments</span>
+                </div>
 
 
                 <!-- rules rows -->
@@ -220,10 +222,13 @@
                     this.deletedRuleStack.push(this.rules.splice(payload.index, 1));
                 },
                 addRule: function() {
-                    //if (!this.addNum) return;
+                    //if (!this.addNum) {
+                    //alert("No point value entered.  This rule will be added as a comment.");
+                    //}
                     //if a rule is added without points, it is accepted as a comment
 
                     if (!this.addDesc) return;
+
                     this.rules.push({
                         pts: this.addNum,
                         desc: this.addDesc
