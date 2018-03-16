@@ -1,13 +1,25 @@
 const router = require('express').Router();
 
-const db = require('../db');
+const Assignments = require('../models/assignments.model');
 
-router.get('/assignment', function(req, res) {
-  db
-    .connect('assignments')
-    .then((collection) => collection.find({}).toArray())
+router.get('/assignments', function(req, res) {
+  Assignments.getAssignments()
     .then(res.json.bind(res))
-    .catch(console.log);
+    .catch((err) => {
+      console.log(err);
+
+      res.status(500).json({
+        error: 'server error occured while trying to retrieve assignments'
+      });
+    });
 });
+
+// get assignment by id
+
+// create new assignment
+
+// delete assignment
+
+// update existing assignment
 
 module.exports = router;
