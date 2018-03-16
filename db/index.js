@@ -1,13 +1,34 @@
 const mongoClient = require('mongodb').MongoClient;
 
+// holds global instance of db connection
+state = {
+  db: null
+};
+
 // takes the name of a collection and returns a connection to that collection on mlab dev db
-function connect(collection) {
-  return mongoClient
-    .connect(process.env.MONGODB_URI)
-    .then((client) => client.db('grader-aide-dev'))
-    .then((db) => db.collection(collection));
+async function connect() {
+  const client = await mongoClient.connect(process.env.MONGODB_URI);
+
+  // right now just hardcoding dev database
+  state.db = client.db('grader-aide-dev');
 }
 
-function close() {}
+// returns db connection itself if you do not want to specift a collection
+function get() {
+  return state.db;
+}
 
-module.exports = { connect };
+// returns a database collection (table) to perform operations on
+function collection(c) {
+  return state.db.collection(c);
+}
+
+async function close() {
+  if (!state.db) return;
+
+  await state.db.close();
+
+  state.db = null;
+}
+
+module.exports = { connect, get, collection, close };
