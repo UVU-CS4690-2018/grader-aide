@@ -1,12 +1,13 @@
 const router = require('express').Router();
 
-const db = require('../db/mongo');
+const db = require('../db');
 
 router.get('/assignment', function(req, res) {
-  console.log(db);
-  //db()
-  // .then(console.log)
-  // .catch(console.log);
+  db
+    .connect('assignments')
+    .then((collection) => collection.find({}).toArray())
+    .then(res.json.bind(res))
+    .catch(console.log);
 });
 
 module.exports = router;

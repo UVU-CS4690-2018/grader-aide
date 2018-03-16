@@ -4,6 +4,8 @@ const express = require('express');
 const logger = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
+
+// load .env variables
 require('./config/config');
 
 let app = express();
