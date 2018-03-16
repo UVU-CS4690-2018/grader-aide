@@ -265,7 +265,17 @@
                     rule.pts = parseInt(payload.pts);
                 },
                 saveChanges: function(event) {
-                    alert('saving changes');
+                    axios.post('/api/v1/save', {
+                        'name': this.name,
+                        'totalPts' : this.totalPts,
+                        'rules' : this.rules
+                    })
+                    .then(function(response){
+                        console.log(response)
+                    })
+                    .catch(function(error){
+                        console.log(error)
+                    })
                 },
                 createNewAssignment: function() {
                     this.rules = [];

@@ -8,6 +8,7 @@ let favicon = require('serve-favicon');
 let bodyParser = require('body-parser');
 let path = require('path');
 let helmet = require('helmet');
+let fs = require('fs')
 
 let app = express();
 
@@ -31,5 +32,13 @@ app.get('*', function(req, res) {
   
 })
 
+app.post('/api/v1/save', function(req,res) {
+  let name = req.body.name + '.json';
+  name = name.replace(' ','');
+  
+  let data = JSON.stringify(req.body);
+  fs.writeFile(name, data,(err) => { })
+  res.send(200)
+});
 
 app.listen(8080);
