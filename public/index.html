@@ -4,70 +4,217 @@
 <head>
   <meta charset="UTF-8">
   <title>GraderAide</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Bootstrap 4, from LayoutIt!</title>
+
+    <meta name="description" content="Source code generated using layoutit.com">
+    <meta name="author" content="LayoutIt!">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.15/dist/vue.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  
+  <!--<link rel="stylesheet" href="uvutheme.css">-->
   <style>
-     .clickable { /* TODO */
+     .clickable {
        cursor: pointer;
+     }
+     .removeButton {
+       color: red;
      }
   </style>
   
-  <script src="https://cdn.jsdelivr.net/npm/vue"></script><!-- TODO -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script><!-- TODO -->
+  <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
 </head>
 
 <body>
   <div class="container" id="app">
+    
     <div class="row">
       
       <!-- title row -->
       <div class="col-xl-6 offset-xl-3">
-        <h1>{{assignmentName}}</h1><!-- TODO -->
+        <h1>{{name}}</h1><!-- TODO -->
         <h4>{{totalPts}} pts</h4>
+        <div v-if="!plusFormActive" @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
+        <div>
+          <select v-model="selectedAssignment" @change="loadLastAssignent(selectedAssignment)">
+            <option v-for="assignment of assignments">
+                    {{assignment}}
+                </option>
+          </select>
+        </div>
 
         <!-- rules rows -->
         <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
           <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
             {{rule.pts | positive}} {{rule.desc}}
-            <span class="clickable float-right" @click="removeRule(i)" v-html="REDX" title="Remove"></span><br>
+            <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
+            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)" title="Remove">
+            <br>
           </input>
         </div>
         
         <!-- add row -->
-        <input type="number" class="col-xl-2" v-model.number="addNum" title="pts (positive or negative)">
-        <input type="text"   class="col-xl-5" v-model.trim="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
-        <span class="clickable float-right" @click="addRule()" title="Add">+</span><br>
+        <div v-if="plusFormActive">
+          <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addRule()" title="pts (positive or negative)">
+          <input type="text"   class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
+          <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
+        </div>
 
         <!-- output rows -->
         <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
           <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
           <hr> {{actualPts}}
+          <hr>
+          <span v-for="selectedComment of selectedComments">{{selectedComment.message}}<br></span>
         </div>
         <div v-else class="alert alert-success" role="alert">
           <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <b>Good Job</b>
           <hr> {{actualPts}}
+          <hr>
+          <span v-for="selectedComment of selectedComments">{{selectedComment.message}}<br></span>
+        </div>
+        <div v-for="(comment, i) of comments">
+          <input type="checkbox" name="comment" :value="comment" v-model="selectedComments">
+            {{comment.message}}
+            <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
+            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeComment(i)" title="Remove">
+            <br>
+          </input>
+        </div>
+        <div v-if="!plusCommentFormActive" @click="plusCommentFormActive = true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
+        <div v-if="plusCommentFormActive">
+          <input type="text"   class="col-xl-10" v-model.trim.lazy="addCom" @keyup.enter="addComment()" placeholder="Add comment here...">
+          <img src="img/plusGreen.svg" class="clickable float-right" @click="addComment()" title="Add"><br>
         </div>
       </div>
     </div>
-<pre>{{addNum}} {{addDesc}}</pre>    
+   <div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			 <a id="modal-860867" href="#modal-container-860867" role="button" class="btn btn-success" data-toggle="modal">Create a New Assignment</a>
+			
+			<div class="modal fade" id="modal-container-860867" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="myModalLabel">
+								Creat a new Assignment
+							</h5> 
+    							<button type="button" class="close" data-dismiss="modal">
+    								<span aria-hidden="true">×</span>
+    							</button>
+    						</div>
+    						<div class="modal-body">
+                  <div class="col-xl-6 offset-xl-3">
+                    <div class="form-group">
+                      <label for="AssignmentName">Enter Assignment Name</label>
+                      <input type="assignment" v-model="newAssignmentName" class="form-control" id="AssingmentName" placeholder="Enter Assignment Name">
+                    </div>
+                    <div class="form-group">
+                      <label for="Points">Points</label>
+                      <input type="points" class="form-control" v-model="newPoints" id="Points" type="number" placeholder="100">
+                    </div>
+                    <label for="Rules">Rules</label>
+                    <div v-if="!plusFormNewActive" @click="plusFormNewActive=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
+
+                    <div v-for="(rule, i) of newRules" :key="rule.desc">
+                      <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
+                        {{rule.pts | positive}} {{rule.desc}}
+                        <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
+                        <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeNewRule(i)" title="Remove">
+                        <br>
+                      </input>
+                    </div>
+                    
+                    
+                    <div v-if="plusFormNewActive">
+                      <input type="text" class="col-xl-1" v-model.number.lazy="addNum" @keyup.enter="addNewRule()" title="pts (positive or negative)">
+                      <input type="text"   class="col-xl-10" v-model.trim.lazy="addDesc" @keyup.enter="addNewRule()" placeholder="Type your new rule here ...">
+                      <img src="img/plusGreen.svg" class="clickable float-right" @click="addNewRule()" title="Add"><br>
+                    </div>
+                    
+                    
+                    <label for="Comments">Comments</label>
+                      <div v-for="(item, i) of comments" :key="message">
+                          {{ item.message }}
+                          <img src="img/pencilBlack.svg" class="clickable float-right" @click="alert('edit stub')" title="Edit">
+                          <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeComment(i)" title="Remove">
+                          <br>
+                      </div>
+
+                      <div v-if="!plusComment" @click="plusComment=true"><img src="img/plusGreen.svg" class="clickable" title="Open Add Fields"></div>
+                      <div v-if="plusComment">
+                        <input type="text" class="col-xl-10" v-model.trim.lazy="addCom" @keyup.enter="addComment()" title="Type New comment Here">
+                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addComment()" title="Add"><br>
+                      </div>
+                    
+                  </div>
+    						</div>
+    						<div class="modal-footer">
+							 
+							<button type="button" class="btn btn-primary" @click="saveNewAssignment" data-dismiss="modal">
+								Save changes
+							</button> 
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+					
+				</div>
+				
+			</div>
+			
+		</div>
+	</div>
   </div>
 
 <script>
+
+/* global axios */
 /* global Vue */
 let app = new Vue({
   el: '#app',
   data: { //persisted data
-    assignmentName: 'Lab 1',
-    totalPts: 100,
-    rules: [
-      {pts: -1, desc: 'wrong file name'},
-      {pts: -5, desc: 'magic number'},
-      {pts: +1, desc: 'Extra credit'}
-    ],
-    //gui state
-    REDX: '&#10060;',
+    message: "",
+    name: null,
+    totalPts: 0,
+    rules: [],
+    //comments: [],
+    //temporary gui state
     selectedRules: [],
+    selectedComments: [],
+    assignments: [],
+    selectedAssignment: null,
+    addCom: null,
     addNum: null,
-    addDesc: null
+    addDesc: null,
+    addCom: null,
+    plusFormActive: false,
+    plusCommentFormActive: false,
+    plusFormNewActive: false,
+    plusComment: false,
+    newPoints: 0,
+    newAssignmentName: "",
+    newRules: [],
+    newComments: [],
+    items: [
+      { message: 'Foo' },
+      { message: 'Bar' }
+    ],
+    comments: [
+      { message: 'Foo' },
+      { message: 'Bar' }
+    ]
+    
   },
   filters: {
     positive: function(num) { //TODO make all caps
@@ -90,58 +237,107 @@ let app = new Vue({
     removeRule: function(i) {
       this.rules.splice(i,1);
     },
+    removeNewRule: function(i) {
+      this.newRules.splice(i,1);
+    },
+    removeComment: function(i) {
+      this.comments.splice(i,1);
+    },
+    editComment: function(i) {
+    },
     addRule: function() {
       if (!this.addNum)  return;
       if (!this.addDesc) return;
       this.rules.push({ pts: this.addNum, desc: this.addDesc });
       this.addNum = null;
       this.addDesc = null;
+      this.plusFormActive = false;
+    },
+    addNewRule: function() {
+      if (!this.addNum)  return;
+      if (!this.addDesc) return;
+      this.newRules.push({ pts: this.addNum, desc: this.addDesc });
+      this.addNum = null;
+      this.addDesc = null;
+      this.plusFormNewActive = false;
+    },
+    addComment: function() {
+      if (!this.addCom)  return;
+      this.comments.push({message: this.addCom});
+      this.addCom = null;
+      this.plusCommentFormActive = false;
+    },
+    saveNewAssignment: function() {
+      axios.post('api/v0/saveFile', {
+        name: this.newAssignmentName,
+        totalPts: parseInt(this.newPoints),
+        rules: this.newRules,
+        comments: this.newComments
+      })
+      .then(function (response) {
+        axios.get(`api/v0/getAssignments`)
+        .then(function (res) {
+          self.assignments = res.data;
+        })
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+      this.newAssignmentName = "";
+      this.newPoints = 0;
+      this.newRules = [];
+      this.newComments = [];
+      let self = this;
+      axios.get(`api/v0/getAssignments`)
+        .then(function (res) {
+          self.assignments = res.data;
+          
+        })
+        self.loadLastAssignent(self.selectedAssignment);
+    },
+    loadLastAssignent: function(lab) {
+      let self = this;
+      this.selectedRules = [];
+      axios.get(`api/v0/getFile/${lab}`)
+        .then(function (response) {
+          self.name = response.data.name;
+          self.totalPts = response.data.totalPts;
+          self.rules = response.data.rules;
+          self.comments = response.data.comments;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+    getAssignments: function() {
+      let self = this;
+      axios.get(`api/v0/getAssignments`)
+        .then(function (res) {
+          self.assignments = res.data;
+          console.log(self.assignments);
+        })
     }
+  },
+  created: function () {
+    let self = this;
+      axios.get(`api/v0/getAssignments`)
+        .then(function (res) {
+          self.assignments = res.data;
+          self.selectedAssignment = self.assignments[0];
+          self.loadLastAssignent('lab1');
+        })
+    
   }
 })
 
 //CLASS MILESTONE
-//TODO lazy modifier
-//TODO load
-//REFACTOR clean up add
-// - pop up the add line
-// - make the text boxes prettier
-// - get a nicer PLUS
-// - make the plus green
-//REFACTOR the two output sections into one
+//REFACTOR prettify the text boxes, can we use regEx to filter what's allowed
+//REFACTOR the two output <div> sections into one
 //FIXME if rule is checked, and then deleted, it's still listed in summary
-
-
-//TEAM MILESTONE
-//TODO save (storing the json) via axios
-//TODO recover/restore deleted rule in memory stack
-//TODO edit rule
-//TODO edit name
-//TODO edit totalPts
-//TODO list of comments (no points up or down)
-//TODO edit list of comments (no points up or down)
-//TODO delete list of comments/recovering
-//TODO create a new assignment
-travis, tanner, bob
-joel, jeremy, cameron
-jessie, harry, andrew
-paul, eric, joseph
-josh, jeff, david
-sam, parker
-
-
+//REFACTOR pop up the add line
 
 //FUTURE
-
-
-
-
-
-
-
-
-
-//TODO load (reading the json)
 //TODO partial credit
 //TODO late penalty percentage
 //TODO tie to Canvas API
