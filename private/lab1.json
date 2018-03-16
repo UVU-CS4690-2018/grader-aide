@@ -1,0 +1,23 @@
+{
+	"name": "Lab 1",
+	"totalPts": 100,
+	"rules": [
+	  {
+			"pts": -1,
+			"desc": "wrong file name you bozo"
+		},
+		{
+			"pts": -5,
+			"desc": "magic number"
+		},
+		{
+			"pts": 1,
+			"desc": "Extra credit"
+		}
+	],
+	"comments": [
+		{ "message": "Good Job"},
+		{ "message": "Bad Job"},
+		{ "message": "Choose a new profession"}
+	]
+}
