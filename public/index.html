@@ -47,7 +47,7 @@
                     <div class="container">
                         <div class="row">
                             <h2 v-if="!editName" class="assignmentName" @click="editName = !editName;">{{name}}</h2>
-                            <input style="width: 50%" v-else class="editName textInput" type="text" v-model="name">
+                            <input style="width: 50%" v-else class="editName textInput" @keyup.enter="editName = !editName; currentAssignment.name = name" type="text" v-model="name">
                             <span v-if="editName" style="padding: 15px;" class="clickable" @click="editName = !editName; currentAssignment.name = name">💾</span>
                             <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editName = !editName;" class="clickable">
                         </div>
@@ -57,7 +57,7 @@
                         <div class="row">
                             <h4 v-if="!editTotalPts" @click="editTotalPts = !editTotalPts;">{{totalPts}}<span class="ptsPts"> pts</span></h4>
                             <input v-else style="width: 20%" class="editTotalPts textInput" type="number" v-model.number="totalPts">
-                            <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts;">💾</span>
+                            <span v-if="editTotalPts" style="padding: 15px;" class="clickable" @click="editTotalPts = !editTotalPts; currentAssignment.totalPts = totalPts;">💾</span>
                             <img v-else style="padding: 15px;" src="img/pencilBlack.svg" @click="editTotalPts = !editTotalPts;" class="clickable">
                         </div>
                     </div>
@@ -296,6 +296,7 @@
                     this.name = newAssignment.name;
                     this.rules = newAssignment.rules;
                     this.totalPts = newAssignment.totalPts;
+                    this.selectedRules = [];
                     this.plusFormActive = false;
                     this.currentAssignment = this.assignments[index];
                 }
