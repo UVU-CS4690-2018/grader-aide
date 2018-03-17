@@ -12,4 +12,14 @@ async function getAssignmentById(_id) {
   return await collection.findOne({ _id });
 }
 
-module.exports = { getAssignments, getAssignmentById };
+async function createAssignment(assignment) {
+  const collection = db.collection('assignments');
+
+  const { result, insertedId } = await collection.insertOne(assignment);
+
+  if (!result.ok) throw new Error('unable to save assignment');
+
+  return insertedId;
+}
+
+module.exports = { getAssignments, getAssignmentById, createAssignment };

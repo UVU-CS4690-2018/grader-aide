@@ -38,13 +38,24 @@ router.get('/assignments/:id', (req, res) => {
     });
 });
 
-// create new assignment
 router.post('/assignments', (req, res) => {
-  console.log(req.body);
+  Assignments.createAssignment(req.body)
+    .then((assignmentId) => {
+      res.json({ assignmentId });
+    })
+    .catch((err) => {
+      console.log(err);
+
+      res.status(500).json({
+        error: 'unable to create assignment'
+      });
+    });
 });
 
-// delete assignment
+// todo
+router.delete('/assignments/:id', (req, res) => {});
 
-// update existing assignment
+// todo
+router.put('assignments/:id', (req, res) => {});
 
 module.exports = router;

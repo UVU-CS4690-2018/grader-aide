@@ -21,6 +21,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// routes
 app.use('/api', assignmentRouter);
 
 const port = process.env.PORT || 3001;
