@@ -14,7 +14,23 @@ router.get('/assignments', function(req, res) {
     });
 });
 
-// get assignment by id
+router.get('/assignments/:id', (req, res) => {
+  const { id } = req.params;
+
+  Assignments.getAssignmentById(id)
+    .then((assignment) => {
+      if (!assignment) res.status(400).json({ error: 'assignment at given id does not exist' });
+
+      res.json(assignment);
+    })
+    .catch((err) => {
+      console.log(err);
+
+      res.status(500).json({
+        error: 'server error occured while trying to retrieve assignments'
+      });
+    });
+});
 
 // create new assignment
 

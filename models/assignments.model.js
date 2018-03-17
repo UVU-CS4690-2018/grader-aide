@@ -6,4 +6,10 @@ async function getAssignments() {
   return await collection.find({}).toArray();
 }
 
-module.exports = { getAssignments };
+async function getAssignmentById(_id) {
+  const collection = db.collection('assignments');
+
+  return await collection.findOne({ _id });
+}
+
+module.exports = { getAssignments, getAssignmentById };
