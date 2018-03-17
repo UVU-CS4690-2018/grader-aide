@@ -1,4 +1,5 @@
 const db = require('../db');
+const ObjectId = require('mongodb').ObjectID;
 
 async function getAssignments() {
   const collection = db.collection('assignments');
@@ -9,7 +10,7 @@ async function getAssignments() {
 async function getAssignmentById(_id) {
   const collection = db.collection('assignments');
 
-  return await collection.findOne({ _id });
+  return await collection.findOne({ _id: ObjectId(_id) });
 }
 
 async function createAssignment(assignment) {
@@ -22,4 +23,11 @@ async function createAssignment(assignment) {
   return insertedId;
 }
 
-module.exports = { getAssignments, getAssignmentById, createAssignment };
+async function destroyAssignment(_id) {
+  console.log('id from request', _id);
+  const collection = db.collection('assignments');
+
+  return await collection.deleteOne({ _id: ObjectId(_id) });
+}
+
+module.exports = { getAssignments, getAssignmentById, createAssignment, destroyAssignment };

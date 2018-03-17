@@ -53,7 +53,13 @@ router.post('/assignments', (req, res) => {
 });
 
 // todo
-router.delete('/assignments/:id', (req, res) => {});
+router.delete('/assignments/:id', (req, res) => {
+  const { id } = req.params;
+
+  Assignments.destroyAssignment(id)
+    .then(log)
+    .catch((err) => console.log('a terrible tragedy has occured'));
+});
 
 // todo
 router.put('assignments/:id', (req, res) => {});
