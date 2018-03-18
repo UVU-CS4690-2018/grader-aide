@@ -205,16 +205,31 @@
       },
       loadView(assignment) {
         let self = this;
-        updateAssignment(this, function (res) {
-          getAssignment(assignment._id, function (response) {
-            console.log('response: ', response); //fill view with valid data from first object returned from line above. 
-            self.assignmentID = response._id;
-            self.assignmentName = response.assignmentName;
-            self.totalPts = response.totalPts;
-            self.rules = response.rules;
-            self.comments = response.comments;
+
+        if (self.assignmentId != null) {
+          updateAssignment(self, function (res) {
+            getAssignment(assignment._id, function (response) {
+              console.log('response: ', response);
+              self.assignmentID = response._id;
+              self.assignmentName = response.assignmentName;
+              self.totalPts = response.totalPts;
+              self.rules = response.rules;
+              self.comments = response.comments;
+            });
           });
-        });
+        } else { //new assignment needs to be created in database.
+          createAssignment(self, function (res) {
+            //console.log('create assignment res: ', res);
+            getAssignment(assignment._id, function (response) {
+              console.log('response: ', response);
+              self.assignmentID = response._id;
+              self.assignmentName = response.assignmentName;
+              self.totalPts = response.totalPts;
+              self.rules = response.rules;
+              self.comments = response.comments;
+            });
+          });
+        }
       },
       newAssignment() {
         let self = this;

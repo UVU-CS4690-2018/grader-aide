@@ -47,3 +47,19 @@ function updateAssignment(assignment, callback) {
       console.log(error);
     });
 }
+
+function createAssignment(assignment, callback) {
+  axios
+    .post(`/api/assignments`, {
+      assignmentName: assignment.assignmentName,
+      totalPts: assignment.totalPts,
+      rules: assignment.rules,
+      comments: assignment.comments
+    })
+    .then(function(response) {
+      callback(response);
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+}
