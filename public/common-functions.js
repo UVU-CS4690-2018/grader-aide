@@ -12,9 +12,36 @@ function generateID() {
 
 function getAssignments(callback) {
   axios
-    .get('/api/assignment')
+    .get('/api/assignments')
     .then(function(response) {
       callback(response.data);
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+}
+
+function getAssignment(id, callback) {
+  axios
+    .get(`/api/assignments/${id}`)
+    .then(function(response) {
+      callback(response.data);
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+}
+
+function updateAssignment(assignment, callback) {
+  axios
+    .put(`/api/assignments/${assignment.assignmentID}`, {
+      assignmentName: assignment.assignmentName,
+      totalPts: assignment.totalPts,
+      rules: assignment.rules,
+      comments: assignment.comments
+    })
+    .then(function(response) {
+      callback(response);
     })
     .catch(function(error) {
       console.log(error);

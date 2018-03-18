@@ -39,10 +39,31 @@
 
     <div class="assignment-container main-background">
       <div class="container">
+
         <div class="row">
-          <div class="col s12">
+          <div class="col s1">
+            <!-- Dropdown Trigger -->
+            <a class='dropdown-button btn-floating' href='#' data-activates='dropdown1'>
+              <i class="large material-icons black">menu</i>
+            </a>
+
+            <!-- Dropdown Structure -->
+            <ul id='dropdown1' class='dropdown-content'>
+              <li v-for="assignment of allAssignments">
+                <a href="#!" @click="loadView(assignment)">{{assignment.assignmentName}}</a>
+              </li>
+              <li>
+                <a href="#!" @click="newAssignment()">
+                  <i class="material-icons">add</i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col s11">
             <div class="card">
               <div class="card-content">
+
+
 
                 <!-- INLINE assignment name editing -->
                 <template v-if="!assignmentEditable">
@@ -160,7 +181,8 @@
       comments: [],
       // gui state
       allSelected: false,
-      modalId: 'edit-modal'
+      modalId: 'edit-modal',
+      allAssignments: null
     },
     filters: {
       handlePositive: function (value) {
@@ -181,37 +203,28 @@
       handleRuleOrCommentStatusChange(item) {
         item.checked = !item.checked;
       },
-      createAssignment() {
-        axios.post(`/assignments/`, {
-            id: this.assignmentID,
-            name: this.assignmentName,
-            totalPts: this.totalPts,
-            nextRuleID: this.nextRuleID,
-            rules: this.rules,
-            comments: this.comments
-          })
-          .then(function (response) {
-            //console.log(response);
-          })
-          .catch(function (error) {
-            console.log(error);
+      loadView(assignment) {
+        let self = this;
+        updateAssignment(this, function (res) {
+          getAssignment(assignment._id, function (response) {
+            console.log('response: ', response); //fill view with valid data from first object returned from line above. 
+            self.assignmentID = response._id;
+            self.assignmentName = response.assignmentName;
+            self.totalPts = response.totalPts;
+            self.rules = response.rules;
+            self.comments = response.comments;
           });
+        });
       },
-      updateAssignment() {
-        axios.put(`/assignments/${this.assignmentID}`, {
-            id: this.assignmentID,
-            name: this.assignmentName,
-            totalPts: this.totalPts,
-            nextRuleID: this.nextRuleID,
-            rules: this.rules,
-            comments: this.comments
-          })
-          .then(function (response) {
-            //console.log(response);
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+      newAssignment() {
+        let self = this;
+        updateAssignment(this, function (res) {
+          self.assignmentID = null;
+          self.assignmentName = 'New assignment';
+          self.totalPts = 100;
+          self.rules = [];
+          self.comments = [];
+        });
       },
       selectAll() {
         if (!this.allSelected) {
@@ -284,12 +297,19 @@
     },
     created: function () {
       let self = this;
-      getAssignments(function (data) {
-        self.assignmentID = data.assignmentID;
-        self.assignmentName = data.assignmentName;
-        self.totalPts = data.totalPts
-        self.rules = data.rules;
-        self.comments = data.comments
+
+      getAssignments(function (response) {
+        self.allAssignments = response;
+        getAssignment(self.allAssignments[0]._id, function (res) {
+
+          console.log('res: ', res);
+          //fill view with valid data from first object returned from line above.
+          self.assignmentID = res._id;
+          self.assignmentName = res.assignmentName;
+          self.totalPts = res.totalPts;
+          self.rules = res.rules;
+          self.comments = res.comments;
+        });
       });
     }
   }); //end app = new Vue
