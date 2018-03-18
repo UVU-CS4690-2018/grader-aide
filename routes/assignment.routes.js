@@ -52,16 +52,32 @@ router.post('/assignments', (req, res) => {
     });
 });
 
-// todo
 router.delete('/assignments/:id', (req, res) => {
   const { id } = req.params;
 
   Assignments.destroyAssignment(id)
     .then(log)
-    .catch((err) => console.log('a terrible tragedy has occured'));
+    .catch((err) => {
+      console.log(err);
+
+      res.status(500).json({
+        error: 'unable to remove assignment'
+      });
+    });
 });
 
-// todo
-router.put('assignments/:id', (req, res) => {});
+router.put('/assignments/:id', (req, res) => {
+  const { id } = req.params;
+
+  Assignments.udpateAssignmentById(id, req.body)
+    .then(() => res.status(204).send())
+    .catch((err) => {
+      console.log(err);
+
+      res.status(500).json({
+        error: 'unable to udpate assignment'
+      });
+    });
+});
 
 module.exports = router;

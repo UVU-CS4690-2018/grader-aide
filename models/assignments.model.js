@@ -32,7 +32,11 @@ async function destroyAssignment(_id) {
   return await collection.deleteOne({ _id: ObjectId(_id) });
 }
 
-async function udpateAssignmentById(_id) {}
+async function udpateAssignmentById(_id, updatedAssignment) {
+  const collection = db.collection('assignments');
+
+  return await collection.replaceOne({ _id: ObjectId(_id) }, updatedAssignment);
+}
 
 module.exports = {
   getAssignments,
