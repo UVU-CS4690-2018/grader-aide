@@ -4,7 +4,10 @@ const ObjectId = require('mongodb').ObjectID;
 async function getAssignments() {
   const collection = db.collection('assignments');
 
-  return await collection.find({}).toArray();
+  return await collection
+    .find({})
+    .project({ assignmentName: 1 })
+    .toArray();
 }
 
 async function getAssignmentById(_id) {
@@ -24,10 +27,17 @@ async function createAssignment(assignment) {
 }
 
 async function destroyAssignment(_id) {
-  console.log('id from request', _id);
   const collection = db.collection('assignments');
 
   return await collection.deleteOne({ _id: ObjectId(_id) });
 }
 
-module.exports = { getAssignments, getAssignmentById, createAssignment, destroyAssignment };
+async function udpateAssignmentById(_id) {}
+
+module.exports = {
+  getAssignments,
+  getAssignmentById,
+  createAssignment,
+  destroyAssignment,
+  udpateAssignmentById
+};
