@@ -205,31 +205,14 @@
       },
       loadView(assignment) {
         let self = this;
-
-        if (self.assignmentId != null) {
-          updateAssignment(self, function (res) {
-            getAssignment(assignment._id, function (response) {
-              console.log('response: ', response);
-              self.assignmentID = response._id;
-              self.assignmentName = response.assignmentName;
-              self.totalPts = response.totalPts;
-              self.rules = response.rules;
-              self.comments = response.comments;
-            });
-          });
-        } else { //new assignment needs to be created in database.
-          createAssignment(self, function (res) {
-            //console.log('create assignment res: ', res);
-            getAssignment(assignment._id, function (response) {
-              console.log('response: ', response);
-              self.assignmentID = response._id;
-              self.assignmentName = response.assignmentName;
-              self.totalPts = response.totalPts;
-              self.rules = response.rules;
-              self.comments = response.comments;
-            });
-          });
-        }
+        self.updateAssignmentInDB();
+        getAssignment(assignment._id, function (response) {
+          self.assignmentID = response._id;
+          self.assignmentName = response.assignmentName;
+          self.totalPts = response.totalPts;
+          self.rules = response.rules;
+          self.comments = response.comments;
+        });
       },
       newAssignment() {
         let self = this;
@@ -276,27 +259,50 @@
           range.moveToElementText(document.getElementById("summary-card"));
           range.select().createTextRange();
           document.execCommand("copy");
-          console.log("doc text copied");
 
         } else if (window.getSelection) {
           var range = document.createRange();
           range.selectNode(document.getElementById("summary-card"));
           window.getSelection().addRange(range);
-          console.log(range);
           document.execCommand("copy");
-          console.log("window text copied");
 
         }
       },
       updateAssignmentName() {
-        console.log(event);
+        //console.log(event);
         this.assignmentEditable = false;
-        // TODO update assignment name in database
+        if (event.type == 'blur') {
+          this.updateAssignmentInDB();
+        }
       },
       updateTotalPts() {
-        console.log(event);
+        //console.log(event);
         this.totalPtsEditable = false;
-        //TODO update totalPts in database
+        if (event.type == 'blur') {
+          this.updateAssignmentInDB();
+        }
+      },
+      updateAssignmentInDB() {
+        let self = this;
+        if (self.assignmentID != null) {
+
+          updateAssignment(self, function (res) {
+            self.updateAllAssignmentsList();
+          }); //don't need to do anything once complete, just update in db
+        } else { //new assignment needs to be created in database.
+
+          createAssignment(self, function (res) {
+            self.assignmentID = res.data.assignmentId;
+            self.updateAllAssignmentsList();
+          }); //don't need to do anything once complete, just update in db
+        }
+      },
+      updateAllAssignmentsList() {
+        let self = this;
+
+        getAssignments(function (response) {
+          self.allAssignments = response;
+        });
       }
     }, //end methods
     computed: {
@@ -317,7 +323,7 @@
         self.allAssignments = response;
         getAssignment(self.allAssignments[0]._id, function (res) {
 
-          console.log('res: ', res);
+          //console.log('res: ', res);
           //fill view with valid data from first object returned from line above.
           self.assignmentID = res._id;
           self.assignmentName = res.assignmentName;
@@ -329,4 +335,5 @@
     }
   }); //end app = new Vue
 </script>
+
 </html>
