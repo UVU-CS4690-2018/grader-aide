@@ -527,11 +527,21 @@
                     'profile': this.profile
 
                 };
-                axios.put('db.json', obj).then(function (response) {
-                    console.log(response);
-                }).catch(function (error) {
-                    console.log(error);
-                });
+                axios.post('db.json', {
+                    firstName: 'Fred',
+                    lastName: 'Flintstone'
+                })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                // axios.put('db.json', obj).then(function (response) {
+                //     console.log(response);
+                // }).catch(function (error) {
+                //     console.log(error);
+                // });
             },
             addComment: function () {
                 if (!this.addCommentBody) return;
@@ -570,6 +580,7 @@
     //FIXME if rule is checked, and then deleted, it's still listed in summary
 
     //TEAM MILESTONE
+    //TODO Important need to fix the axios call to push to db.json
     //TODO save (storing the json) via axios - need to talk with Prof. about why not working
     //TODO recover/restore deleted rule in memory stack --DONE
     //TODO edit rule --DONE
