@@ -1,152 +1,606 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="UTF-8">
-  <title>GraderAide</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  <style>
-     .clickable { /* TODO */
-       cursor: pointer;
-     }
-  </style>
-  
-  <script src="https://cdn.jsdelivr.net/npm/vue"></script><!-- TODO -->
+    <meta charset="UTF-8">
+    <title>GraderAide</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+
+        .removeButton {
+            color: red;
+        }
+
+        /*For the modal*/
+        .modal-mask {
+            position: fixed;
+            z-index: 9998;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, .7);
+            transition: opacity .3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-container {
+            min-width: 40vw;
+            max-width: 80vw;
+            max-height: 80vh;
+            padding: 20px 30px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+            transition: all .3s ease;
+            overflow: auto;
+        }
+
+        /*.modal-body {*/
+        /*    margin: 20px 0;*/
+        /*}*/
+
+        .modal-enter,
+        .modal-leave {
+            opacity: 0;
+        }
+
+        .modal-enter .modal-container,
+        .modal-leave .modal-container {
+            transform: scale(1.1);
+        }
+
+        /*End of modal*/
+
+        .nav-custom > a{
+            color: black;
+            padding-bottom: 20px;
+        }
+        .nav-custom > a:hover{
+            border-bottom: 5px solid darkgreen;
+            padding-bottom: 15px;
+        }
+        .cus-hr {
+            margin-top: -.5rem;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13"></script><!-- TODO -->
+    <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+
 </head>
 
 <body>
-  <div class="container" id="app">
+<div class="container" id="app">
+    <modal-comment :config="modalConfig" :assignment="assignment" :title="modalTitle"
+                   @update:assignment="value => pushValue(value)"></modal-comment>
+
     <div class="row">
-      
-      <!-- title row -->
-      <div class="col-xl-6 offset-xl-3">
-        <h1>{{assignmentName}}</h1><!-- TODO -->
-        <h4>{{totalPts}} pts</h4>
 
-        <!-- rules rows -->
-        <div v-for="(rule, i) of rules" :key="rule.desc"><!-- TODO -->
-          <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
-            {{rule.pts | positive}} {{rule.desc}}
-            <span class="clickable float-right" @click="removeRule(i)" v-html="REDX" title="Remove"></span><br>
-          </input>
-        </div>
-        
-        <!-- add row -->
-        <input type="number" class="col-xl-2" v-model.number="addNum" title="pts (positive or negative)">
-        <input type="text"   class="col-xl-5" v-model.trim="addDesc" @keyup.enter="addRule()" placeholder="Type your new rule here ...">
-        <span class="clickable float-right" @click="addRule()" title="Add">+</span><br>
+        <!-- title row -->
+        <div class="col-xl-6 offset-xl-3">
+            <div class="card" style="margin-top: 4rem">
+                <div class="card-body">
+                    <nav class="navbar navbar-default">
+                        <div class="container-fluid">
+                            <ul class="nav navbar-nav">
+                                <select class="custom-select custom-select-lg mb-3" v-model="currentAssignment"
+                                        @change="getAssignment()">
+                                    <option selected disabled>Select Assignment</option>
+                                    <option v-for="assignment in assignments" v-bind:value="assignment.id">
+                                        {{assignment.id}}
+                                    </option>
+                                </select>
 
-        <!-- output rows -->
-        <div v-if="actualPts < totalPts" class="alert alert-warning" role="alert">
-          <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <hr> {{actualPts}}
+                            </ul>
+                            <ul class="nav navbar-nav navbar-right">
+                                <p class="navbar-text"><b>Points {{totalPts}}</b></p>
+                            </ul>
+                        </div>
+                    </nav>
+                    <!--navbar for create save and edit assignments-->
+                    <nav class="navbar navbar-default">
+                        <div class="container">
+                            <ul class="navbar-nav mx-auto">
+                                <li class="nav-item nav-custom">
+                                    <a class="nav-link" href="#" @click="newAssignment()" title="Create Assignment">Create</a>
+                                </li>
+                            </ul>
+                            <ul class="navbar-nav mx-auto">
+                                <li class="nav-item nav-custom">
+                                    <a class="nav-link" href="#" v-if="currentAssignment != 'Select Assignment'"
+                                       @click="saveState()" title="Save Assignment">Save</a>
+                                </li>
+
+                            </ul>
+                            <ul class="navbar-nav mx-auto">
+                                <li class="nav-item nav-custom">
+                                    <a class="nav-link" href="#" v-if="currentAssignment != 'Select Assignment'"
+                                       @click="editAssignment()" title="Edit Assignment">Edit</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+
+                    <!--rules section-->
+                    <hr class="cus-hr"/>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h5>Rules</h5>
+                        </div>
+                        <div class="col-sm-1" v-if="!plusFormActive && currentAssignment != 'Select Assignment'"
+                             @click="plusFormActive=true"><img src="img/plusGreen.svg" class="clickable"
+                                                               title="Open Add Fields">
+                        </div>
+
+                        <div class="col-sm-1"
+                             v-if="removedRulesStack.length > 0 && currentAssignment != 'Select Assignment'"
+                             @click="undoRemove()"><img src="img/undoBlack.svg" class="clickable"
+                                                        title="Undo">
+                        </div>
+                    </div>
+                    <!-- rules rows -->
+                    <div v-for="(rule, i) of rules" :key="i"><!-- TODO -->
+                        <div v-if="ruleIndToEdit == i">
+                            <input type="text" class="col-sm-2" :value="rule.pts" v-model.number.lazy="rule.pts"
+                                   @keyup.enter="saveRuleEdit(rule)" title="pts (positive or negative)">
+                            <input type="text" class="col-sm-9" :value="rule.desc" v-model.trim.lazy="rule.desc"
+                                   @keyup.enter="saveRuleEdit(rule)">
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="saveRuleEdit(rule)"
+                                 title="Save"><br>
+                        </div>
+                        <div v-if="ruleIndToEdit != i">
+                            <input type="checkbox" name="rubric" :value="rule" v-model="selectedRules">
+                            {{rule.pts | positive}} {{rule.desc}}
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="ruleIndToEdit = i"
+                                 title="Edit">
+                            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeRule(i)"
+                                 title="Remove">
+                            <br>
+                            </input>
+                        </div>
+                    </div>
+
+                    <!-- add row -->
+                    <div v-if="plusFormActive">
+                        <input type="text" class="col-sm-2" v-model.number.lazy="addNum" @keyup.enter="addRule()"
+                               title="pts (positive or negative)">
+                        <input type="text" class="col-sm-9" v-model.trim.lazy="addDesc" @keyup.enter="addRule()"
+                               placeholder="Type your new rule here ...">
+                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addRule()" title="Add"><br>
+                    </div>
+
+                    <!-- output rows -->
+                    <div v-if="actualPts < totalPts" class="alert alert-warning mt-3" role="alert">
+                        <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+                        <span v-for="selectedComment of selectedComments">- {{selectedComment}}<br></span>
+                        <hr>
+                        {{actualPts}}
+
+                    </div>
+                    <div v-else class="alert alert-success mt-3" role="alert">
+                        <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
+                        <b>Good Job</b><br>
+                        <span v-for="selectedComment of selectedComments">- {{selectedComment}}<br></span>
+                        <hr>
+                        {{actualPts}}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h5>Comments</h5>
+                        </div>
+                        <div class="col-sm-1 float-right" v-if="!addCommentActive"
+                             @click="addCommentActive=true"><img src="img/plusGreen.svg" class="clickable"
+                                                                 title="Open Add Fields">
+                        </div>
+                        <div class="col-sm-1"
+                             v-if="removeCommentStack.length > 0"
+                             @click="undoRemoveComment()"><img src="img/undoBlack.svg" class="clickable"
+                                                               title="Undo">
+                        </div>
+                    </div>
+
+                    <!-- comment rows -->
+                    <div v-for="(comment, i) of comments" :key="comment.id"><!-- TODO -->
+                        <div v-if="commIndToEdit != i">
+                            <input type="checkbox" name="rubric" :value="comment.body" v-model="selectedComments">
+                            {{comment.body}}
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="commIndToEdit = i"
+                                 title="Edit">
+                            <img src="img/xRed.svg" class="clickable float-right removeButton" @click="removeComment(i)"
+                                 title="Remove">
+                            <br>
+                            </input>
+                        </div>
+                        <div v-if="commIndToEdit == i">
+                            <input v-if="commIndToEdit != -1" type="text" class="col-sm-9" name="rubric"
+                                   :value="comment.body"
+                                   v-model="comment.body" @keyup.enter="commIndToEdit = -1">
+                            <img src="img/pencilBlack.svg" class="clickable float-right" @click="commIndToEdit = -1"
+                                 title="Save Edit">
+                            <br>
+                            </input>
+                        </div>
+
+
+                    </div>
+                    <!-- add comment -->
+                    <div v-if="addCommentActive">
+                        <input type="text" class="col-sm-9" v-model.trim.lazy="addCommentBody"
+                               @keyup.enter="addComment()"
+                               placeholder="Type your new comment here ...">
+                        <img src="img/plusGreen.svg" class="clickable float-right" @click="addComment()"
+                             title="Add"><br>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div v-else class="alert alert-success" role="alert">
-          <span v-for="selectedRule of selectedRules">{{selectedRule.pts | positive}} {{selectedRule.desc}}<br></span>
-          <b>Good Job</b>
-          <hr> {{actualPts}}
-        </div>
-      </div>
     </div>
-<pre>{{addNum}} {{addDesc}}</pre>    
-  </div>
+    <!--<pre>selectedComments is {{selectedComments}}</pre>-->
+    <br>
+</div>
+
+<!--template for the basic modal-->
+<template id="modal">
+    <div class="modal-mask" v-if="config.show" :config="config" transition="modal" @click="close">
+        <div class="modal-container" @click.stop>
+            <slot></slot>
+        </div>
+    </div>
+</template>
+<!--template for the Assignment modal-->
+<template id="modal-comment">
+    <modal :config="config">
+        <div class="modal-header">
+            <h5>{{title}}</h5>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="assignment">Name</label>
+                <input type="email" class="form-control" id="assignment" placeholder="Name" v-bind:value="assignment.id"
+                       v-on:input="updateValue($event.target.value,)" lazy>
+            </div>
+            <div class="form-group">
+                <label for="points">Points</label>
+                <input type="number" class="form-control" id="points" placeholder="0" v-bind:value="assignment.points"
+                       v-on:input="updatePoints($event.target.value)" lazy>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" @click="save()">OK</button>
+        </div>
+    </modal>
+</template>
 
 <script>
-/* global Vue */
-let app = new Vue({
-  el: '#app',
-  data: { //persisted data
-    assignmentName: 'Lab 1',
-    totalPts: 100,
-    rules: [
-      {pts: -1, desc: 'wrong file name'},
-      {pts: -5, desc: 'magic number'},
-      {pts: +1, desc: 'Extra credit'}
-    ],
-    //gui state
-    REDX: '&#10060;',
-    selectedRules: [],
-    addNum: null,
-    addDesc: null
-  },
-  filters: {
-    positive: function(num) { //TODO make all caps
-      if (num > 0) return `+${num}`;
-      return num;
-    }
-  },
-  computed: {
-    actualPts: function() { //add up all selected pts and subtract from totalPts
-      return this.selectedRules.reduce((acc, el) => acc + el.pts, this.totalPts);
+    /* global axios */
+    /*global Vue*/
 
-      //   let sum = this.totalPts;
-      //   for (rule of this.selectedRules) {
-      //       sum += rule.pts;
-      //   }
-      //   return sum;
-    }
-  },
-  methods: {
-    removeRule: function(i) {
-      this.rules.splice(i,1);
-    },
-    addRule: function() {
-      if (!this.addNum)  return;
-      if (!this.addDesc) return;
-      this.rules.push({ pts: this.addNum, desc: this.addDesc });
-      this.addNum = null;
-      this.addDesc = null;
-    }
-  }
-})
+    // Modal Component
+    const Modal = Vue.extend({
+        props: {
+            config: {
+                validator: function (value) {
+                    return value.hasOwnProperty('show') && typeof value.show === 'boolean'
+                },
+            },
+        },
+        data: function () {
+            return {
+                ordernumber: 888
+            }
+        },
+        methods: {
+            close: function () {
+                this.config.show = false
+            },
+        },
+        data: function () {
+            return {
+                ordernumber: 999
+            }
+        },
+        ready: function () {
+            // Close the modal when the escape key is pressed.
+            var self = this
+            document.addEventListener('keydown', function () {
+                if (self.config.show && event.keyCode === 27) {
+                    self.close()
+                }
+            })
+        },
+        template: '#modal',
+    });
 
-//CLASS MILESTONE
-//TODO lazy modifier
-//TODO load
-//REFACTOR clean up add
-// - pop up the add line
-// - make the text boxes prettier
-// - get a nicer PLUS
-// - make the plus green
-//REFACTOR the two output sections into one
-//FIXME if rule is checked, and then deleted, it's still listed in summary
+    // Modal Comment Component for editing and creating new assignments
+    const ModalComment = Vue.extend({
+        props: ['config', 'assignment', 'title'],
+        components: {
+            modal: Modal,
+        },
+        methods: {
+            updateValue: function (value) {
+                //console.log(value);
+                this.assignment.id = value;
+                // if(value)
+                //     this.$emit('update:assignment', this.assignment);
+            },
+            updatePoints: function (points) {
+                //console.log(points);
+                // this.totalPts = points;
+                this.assignment.points = points;
 
-
-//TEAM MILESTONE
-//TODO save (storing the json) via axios
-//TODO recover/restore deleted rule in memory stack
-//TODO edit rule
-//TODO edit name
-//TODO edit totalPts
-//TODO list of comments (no points up or down)
-//TODO edit list of comments (no points up or down)
-//TODO delete list of comments/recovering
-//TODO create a new assignment
-travis, tanner, bob
-joel, jeremy, cameron
-jessie, harry, andrew
-paul, eric, joseph
-josh, jeff, david
-sam, parker
+            },
+            close: function () {
+                this.config.show = false;
+            },
+            save: function () {
+                // TODO: implement the form logic.
+                //console.log('save save', this.assignment);
+                if (this.assignment.id)
+                    this.$emit('update:assignment', this.assignment);
+                this.close();
+            },
+        },
+        template: '#modal-comment',
+    });
 
 
+    let app = new Vue({
+        el: '#app',
+        data: { //persisted data
+            name: null,
+            totalPts: 0,
+            rules: [],
+            assignments: [],
+            comments: [],
+            profile: null,
+            //temporary gui state
+            selectedRules: [],
+            selectedComments: [],
+            addNum: null,
+            addDesc: null,
+            addCommentBody: null,
+            addAssignment: null,
+            plusFormActive: false,
+            addCommentActive: false,
+            currentAssignment: "Select Assignment",
+            createNew: false,
+            commIndToEdit: -1,
+            ruleIndToEdit: -1,
+            assignment: {
+                id: null,
+                points: 0,
+                editIdx: -1
+            },
+            modalConfig: {
+                show: false,
+                ordernumber: null
+            },
+            srtRulesAmount: 0,
+            endRulesAmount: 0,
+            removedRulesStack: [],
+            removeCommentStack: [],
+            modalTitle: "New Assignment"
+        },
+        components: {
+            ModalComment: ModalComment
+        },
+        filters: {
+            positive: function (num) { //TODO make all caps
+                if (num > 0) return `+${num}`;
+                return num;
+            }
+        },
+        computed: {
+            actualPts: function () { //add up all selected pts and subtract from totalPts
+                return this.selectedRules.reduce((acc, el) => Number(acc) + Number(el.pts), this.totalPts);
 
-//FUTURE
+                //   let sum = this.totalPts;
+                //   for (rule of this.selectedRules) {
+                //       sum += rule.pts;
+                //   }
+                //   return sum;
+            }
+        },
+        methods: {
+            undoRemoveComment: function () {
+                let i = this.removeCommentStack.pop();
+                console.log(i.idx, i.val);
+                this.comments.splice(i.idx, 0, i.val);
+            },
+            removeComment: function (i) {
+                let obj = {
+                    'idx': i,
+                    'val': this.comments[i]
+                };
+                this.removeCommentStack.push(obj);
+                this.comments.splice(i, 1);
+            },
+            removeRule: function (i) {
+                let obj = {
+                    'idx': i,
+                    'val': this.rules[i]
+                };
+                this.removedRulesStack.push(obj);
+                this.rules.splice(i, 1);
+                this.endRulesAmount--;
+            },
+            saveRuleEdit: function (rule) {
+                console.log("save an edit");
+                if (!rule.pts) return;
+                if (!rule.desc) return;
+                this.ruleIndToEdit = -1;
+            },
+            addRule: function () {
+                if (!this.addNum) return;
+                if (!this.addDesc) return;
+                console.log(typeof (this.addNum), typeof (this.addDesc));
+                this.rules.push({pts: this.addNum, desc: this.addDesc});
+                console.log(this.rules);
+                console.log(typeof this.rules[0].addNum);
+                this.addNum = null;
+                this.addDesc = null;
+                this.plusFormActive = false;
+                this.endRulesAmount++;
+            },
+            undoRemove: function () {
+                let i = this.removedRulesStack.pop();
+                console.log(i.idx, i.val);
+                this.rules.splice(i.idx, 0, i.val);
+            },
+            getAssignment: function () {
+                //console.log(this.currentAssignment);
+                //console.log(this.assignments.filter(e => e.id === this.currentAssignment));
+                console.log(this.removedRulesStack);
+                while (this.removedRulesStack.length > 0) {
+                    let i = this.removedRulesStack.pop();
+                    console.log(i.idx, i.val);
+                    this.rules.splice(i.idx, 0, i.val);
 
+                    // this.removedRulesStack = [];
+                }
+                let found = this.assignments.filter(e => e.id === this.currentAssignment);
+                console.log(found[0].rules);
+                this.rules = found[0].rules;
+                this.totalPts = found[0].totalPts;
+                this.plusFormActive = false;
+                this.selectedRules = [];
 
+                //need to find away to figure out if the rules changed
+                this.srtRulesAmount = this.rules.length;
+                this.endRulesAmount = this.rules.length;
+            },
+            showModal: function () {
+                // this.modalConfig.ordernumber = id;
+                console.log(this.assignment);
+                this.modalConfig.show = true;
+                //this.assignment.id = null;
+                //this.assignment.totalPts = 0;
+            },
+            pushValue: function (value) {
+                if (value.editIdx >= 0) {
+                    this.assignments[value.editIdx].id = value.id;
+                    this.assignments[value.editIdx].totalPts = value.points;
+                    this.currentAssignment = this.assignments[value.editIdx].id;
+                    this.totalPts = this.assignments[value.editIdx].totalPts;
+                }
+                else {
 
+                    let newObj = {};
+                    newObj.id = value.id;
+                    newObj.totalPts = value.points;
+                    newObj.rules = [];
+                    this.assignments.push(newObj);
+                }
+                //console.log('this is the new obj', newObj);
 
+                this.assignment.id = null;
+                this.assignment.points = 0;
+                this.assignment.editIdx = -1;
+                this.modalTitle = "New Assignment";
+                // console.log(value);
+            },
+            editAssignment: function () {
+                this.assignment.id = this.currentAssignment;
+                this.assignment.points = this.totalPts;
+                this.assignment.editIdx = this.assignments.findIndex(e => e.id === this.currentAssignment);
+                this.modalTitle = "Edit Assignment";
+                this.showModal();
+            },
+            newAssignment: function () {
+                this.assignment.id = null;
+                this.assignment.points = 0;
+                this.assignment.editIdx = -1;
+                this.modalTitle = "New Assignment";
+                this.showModal();
+            },
+            saveState: function () {
+                console.log(this.assignments);
+                let obj = {
+                    'assignments': this.assignments,
+                    'comments': this.comments,
+                    'profile': this.profile
 
+                };
+                axios.post('db.json', {
+                    firstName: 'Fred',
+                    lastName: 'Flintstone'
+                })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                // axios.put('db.json', obj).then(function (response) {
+                //     console.log(response);
+                // }).catch(function (error) {
+                //     console.log(error);
+                // });
+            },
+            addComment: function () {
+                if (!this.addCommentBody) return;
+                const nextId = this.comments[this.comments.length - 1].id++;
+                //add comment to array with id
+                this.comments.push({'id': nextId, 'body': this.addCommentBody, 'postId': nextId});
+                this.addCommentBody = null;
+                this.addCommentActive = false;
+                // console.log(this.addCommentBody);
+            }
+        },
+        created: function () {
+            let self = this;
+            axios.get('db.json')
+                .then(function (response) {
+                    //console.log(response.data);
+                    self.assignments = response.data.assignments;
+                    self.comments = response.data.comments;
+                    self.profile = response.data.profile;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    })
 
+    //CLASS MILESTONE
+    //TODO lazy modifier
+    //TODO load
+    //REFACTOR clean up add
+    // - pop up the add line
+    // - make the text boxes prettier
+    // - get a nicer PLUS
+    // - make the plus green
+    //REFACTOR the two output sections into one
+    //FIXME if rule is checked, and then deleted, it's still listed in summary
 
+    //TEAM MILESTONE
+    //TODO Important need to fix the axios call to push to db.json
+    //TODO save (storing the json) via axios - need to talk with Prof. about why not working
+    //TODO recover/restore deleted rule in memory stack --DONE
+    //TODO edit rule --DONE
+    //TODO edit name --DONE
+    //TODO edit totalPts --DONE
+    //TODO list of comments (no points up or down) DONE
+    //TODO edit list of comments (no points up or down) DONE
+    //TODO delete list of comments/recovering DONE
+    //TODO create a new assignment --DONE
+    //TODO create newAssignment function same as edit. DONE
 
-
-//TODO load (reading the json)
-//TODO partial credit
-//TODO late penalty percentage
-//TODO tie to Canvas API
+    //FUTURE
+    //TODO load (reading the json)
+    //TODO partial credit
+    //TODO late penalty percentage
+    //TODO tie to Canvas API
 
 </script>
+
 </body>
 
 </html>
+
