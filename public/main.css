@@ -1,0 +1,602 @@
+html {
+    color: #222;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+body {
+    background-color: #29363f;
+    color: white;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+/*
+ * A better looking default horizontal rule
+ */
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ * https://github.com/h5bp/html5-boilerplate/issues/440
+ */
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+/*
+ * Remove default fieldset styles.
+ */
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * Allow only vertical resizing of textareas.
+ */
+
+textarea {
+    resize: vertical;
+}
+
+/* ==========================================================================
+   Browser Upgrade Prompt
+   ========================================================================== */
+
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+label {
+    color: #d1d1d1;
+}
+
+.textInput {
+    background-color: #29363f;
+    border: 2px solid #315269;
+    color: white;
+}
+
+.centered {
+    min-height: 100%; /* Fallback for browsers do NOT support vh unit */
+    min-height: 100vh; /* These two lines are counted as one :-)       */
+
+    display: flex;
+    align-items: center;
+}
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+.create-btn {
+    width: 100%;
+    margin-top: 15px;
+}
+
+@media (min-width: 992px) {
+    .logoTitle {
+        border-right: solid white 4px;
+        padding-top: 90px;
+    }
+}
+
+@media (max-width: 992px) {
+    .logoTitle {
+        padding-top: 40px;
+    }
+}
+
+.navbar-custom {
+    background-color: #1b2227;
+    box-shadow: 0 4px 8px 0 rgba(0, 78, 123, 0.15), 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.navbar-custom a {
+    color: white;
+}
+
+.navbar-custom a:hover {
+    color: #628faf;
+}
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+/*
+ * Hide visually and from screen readers
+ */
+
+.hidden {
+    display: none !important;
+}
+
+/*
+ * Hide only visually, but have it available for screen readers:
+ * https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+ *
+ * 1. For long content, line feeds are not interpreted as spaces and small width
+ *    causes content to wrap 1 word per line:
+ *    https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
+ */
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap; /* 1 */
+}
+
+/*
+ * Extends the .visuallyhidden class to allow the element
+ * to be focusable when navigated to via the keyboard:
+ * https://www.drupal.org/node/897638
+ */
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    -webkit-clip-path: none;
+    clip-path: none;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+    white-space: inherit;
+}
+
+/*
+ * Hide visually and from screen readers, but maintain layout
+ */
+
+.invisible {
+    visibility: hidden;
+}
+
+/*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    `contenteditable` attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+
+.clearfix:before,
+.clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
+
+@media print,
+(-webkit-min-device-pixel-ratio: 1.25),
+(min-resolution: 1.25dppx),
+(min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid the additional HTTP request:
+   http://www.phpied.com/delay-loading-your-print-css/
+   ========================================================================== */
+
+@media print {
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important;
+        /* Black prints faster:
+                                          http://www.sanbeiji.com/archives/953 */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links that are fragment identifiers,
+     * or use the `javascript:` pseudo protocol
+     */
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    pre {
+        white-space: pre-wrap !important;
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    /*
+     * Printing Tables:
+     * http://css-discuss.incutio.com/wiki/Printing_Tables
+     */
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.fileSubmit {
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    background-image: linear-gradient(to bottom, #b9b9b9 0, #696969 100%);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 5px 15px 0 rgba(5, 5, 5, 0.19);
+}
+
+.fileSubmit:hover {
+    background-image: linear-gradient(to bottom, #a2a0a0 0, #565656 100%);
+}
+
+.assignmentHdr {
+    margin-bottom: 0px;
+    padding-top: 12px;
+    padding-bottom: 15px;
+    color: rgb(41, 54, 63);
+    padding-left: 15px;
+    font-weight: bolder;
+    font-size: 22px;
+    background-color: whitesmoke;
+}
+
+.recentHdr {
+    border-top: solid #8a8a8a 3px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    color: rgb(41, 54, 63);
+    padding-left: 15px;
+    font-weight: bolder;
+    font-size: 22px;
+    background-color: whitesmoke;
+}
+
+.stripes {
+    min-width: 400px;
+    color: black;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px, rgba(0, 0, 0, 0.19) 0px 0px 30px 0px;
+}
+
+.stripes tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.stripes tr:nth-child(odd) {
+    /*
+    background-color: #60809acf;
+    */
+    background-color: #c8c8c8cf;
+}
+
+.stripes th, td {
+    text-align: left;
+    padding: 4px;
+}
+
+.pts {
+    max-width: 25px;
+    font-size: 18px;
+    font-weight: bolder;
+}
+
+.checks {
+    min-width: 27px;
+}
+
+input[type=checkbox] {
+    width: 50px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 5px;
+    left: 5px;
+    right: 0;
+    bottom: -5px;
+    /*
+    background-color: #ccc;
+    */
+    background-color: #435663;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 19px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(15px);
+    -ms-transform: translateX(15px);
+    transform: translateX(15px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.addBtn {
+    color: #29363f;
+    font-size: 28px;
+}
+
+.addBtn:hover {
+    color: #1d262c;
+}
+
+.assignmentList {
+    margin-left: 0px;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    max-height: 40vh;
+    overflow-y: scroll;
+}
+
+.assignmentListRecent {
+    margin-left: 0px;
+    padding-left: 0px;
+    max-height: 35vh;
+    overflow-y: scroll;
+}
+
+.listColumn {
+    height: -webkit-fill-available;
+    height: 100vh;
+    padding-left: 0px;
+    padding-right: 0px;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3), 0 10px 20px 0 rgba(5, 5, 5, 0.19);
+}
+
+.listHdr {
+    margin-left: 15px;
+}
+
+.detailHdr {
+    font-weight: bolder;
+    margin-left: 15px;
+    color: #567289;
+}
+
+.detailHdrFirst {
+    font-weight: bolder;
+    color: #567289;
+}
+
+.mainBody {
+    padding: 50px;
+    margin-top: 25px;
+}
+
+.assignmentName {
+    color: white;
+}
+
+.ptsMain {
+    font-size: 22px;
+}
+
+.ptsNums {
+    font-weight: bolder;
+    color: #d1d1c8;
+}
+
+.ptsPts {
+    color: #2c699f;
+}
+
+.addRuleCell {
+    height: 42px;
+}
+
+.addRuleNum {
+    width: 65px;
+}
+
+.addRuleDesc {
+    width: 95%;
+}
+
+.gradeBtn {
+    padding: 5px;
+    font-size: 20px;
+    font-weight: bolder;
+    width: 200px;
+    margin-top: 25px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.removeButton {
+    color: red;
+}
+.editName {
+    font-size: 2rem;
+    margin-bottom: .5rem;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.2;
+}
+.editTotalPts {
+    font-size: 1.5rem;
+    margin-bottom: .5rem;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.margMain {
+    margin-top: 25px;
+}
+
+.ruleRow:nth-child(odd) {
+    background-color: #31414c;
+}
+
+.assignmentList {
+    margin-left: 0px;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.assignmentList {
+    margin-left: 0px;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.assignmentListContainer {
+    height: -webkit-fill-available;
+    height: 100vh;
+    padding-left: 0px;
+    padding-right: 0px;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3), 0 10px 20px 0 rgba(5, 5, 5, 0.19);
+}

@@ -1,0 +1,26 @@
+{
+	"name": "Lab 1",
+	"totalPts": 100,
+	"rules": [
+	  {
+			"pts": -1,
+			"desc": "wrong file name"
+		},
+		{
+			"pts": -5,
+			"desc": "magic number"
+		},
+		{
+			"pts": -2,
+			"desc": "blatant ignorance"
+		},
+		{
+			"pts": -8,
+			"desc": "inline styling"
+		},
+		{
+			"pts": 1,
+			"desc": "Extra credit"
+		}
+	]
+}
