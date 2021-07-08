@@ -1,0 +1,19 @@
+.main-background {
+  background: linear-gradient(rgb(76, 175, 80) 50%, rgb(250, 250, 250) 0%);
+  position: fixed;
+  background-attachment: fixed;
+}
+
+.assignment-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: min-content;
+  position: relative;
+}
+
+.card-title.main-card {
+  font-size: 48px;
+}
